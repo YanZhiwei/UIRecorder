@@ -12,7 +12,7 @@ UI Recorder 是一个基于 .NET 8 开发的UI自动化测试工具，它支持�
 
 以下是UI Recorder的使用截图：
 
-![UI Recorder Screenshot](screenshots/UIRecorder-Screenshot.png "UI Recorder Screenshot")
+![UI Recorder Screenshot](screenshots/UIRecorder-Screenshot.jpg "UI Recorder Screenshot")
 
 ## 代码概览
 

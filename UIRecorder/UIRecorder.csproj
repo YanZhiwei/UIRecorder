@@ -9,9 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Tenon.Automation.Windows" Version="0.0.1-alpha-202405021336" />
-    <PackageReference Include="Tenon.Infra.Windows.Form" Version="0.0.1-alpha-202405021336" />
+    <PackageReference Include="Tenon.Automation.Windows" Version="0.0.1-alpha-202405141510" />
+    <PackageReference Include="Tenon.Infra.Windows.Form" Version="0.0.1-alpha-202405141510" />
     <PackageReference Include="UIAComWrapperNetstandard" Version="1.0.1" />
   </ItemGroup>
+
 
 </Project>

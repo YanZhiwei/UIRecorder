@@ -56,16 +56,17 @@ public partial class MainForm : Form
     {
         try
         {
-            AddLog($"IdentifyFromPoint:{e.Location}");
+
             var uiObjectInfo = GetUiObjectFromPointAsync(e.Location).ConfigureAwait(false).GetAwaiter()
                 .GetResult();
+            AddLog($"IdentifyFromPoint:{e.Location},className:{uiObjectInfo.Item2}");
             if (uiObjectInfo.Item1.IsEmpty)
             {
                 _windowsHighlight.Hide();
                 return;
             }
 
-            _windowsHighlight.SetLocation(uiObjectInfo.Item1);
+            _windowsHighlight.SetLocation(uiObjectInfo.Item1, uiObjectInfo.Item2);
         }
         catch (Exception ex)
         {
