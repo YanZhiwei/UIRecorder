@@ -1,7 +1,6 @@
 using System.Windows.Automation;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
-using Tenon.Infra.Windows.Win32;
 using Process = System.Diagnostics.Process;
 
 namespace UIRecorder;
@@ -20,23 +19,18 @@ public partial class MainForm : Form
         _processName = string.Concat(Process.GetCurrentProcess().ProcessName, ".exe");
     }
 
-    private async Task<Tuple<Rectangle, string>> GetUiObjectFromPointAsync(Point location)
+    private async Task<Tuple<Rectangle, string>> ElementFromPointAsync(Point location)
     {
         return await Task.Factory.StartNew(() =>
         {
+            var point = new Point(location.X, location.Y);
             var automationElement =
-                AutomationElement.FromPoint(new Point(location.X, location.Y));
-            if (automationElement == null)
-                return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-            var hWnd = Window.Get(location);
-            if (hWnd == IntPtr.Zero) return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-            var processId = Window.GetProcessId(hWnd);
-            if (processId == IntPtr.Zero) return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-            var process = Process.GetProcessById((int)processId);
+                AutomationElement.FromPoint(point);
+            if (automationElement == null) return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
             var rect = automationElement.Current.BoundingRectangle;
-            var className = automationElement.GetCurrentPropertyValue(AutomationElement.ClassNameProperty, false)
-                ?.ToString();
-            return new Tuple<Rectangle, string>(rect, className);
+            var controlType =
+                (ControlType)automationElement.GetCurrentPropertyValue(AutomationElement.ControlTypeProperty, false);
+            return new Tuple<Rectangle, string>(rect, controlType?.ProgrammaticName?.Substring("ControlType.".Length));
         });
     }
 
@@ -56,21 +50,20 @@ public partial class MainForm : Form
     {
         try
         {
-
-            var uiObjectInfo = GetUiObjectFromPointAsync(e.Location).ConfigureAwait(false).GetAwaiter()
+            var identifyElement = ElementFromPointAsync(e.Location).ConfigureAwait(false).GetAwaiter()
                 .GetResult();
-            AddLog($"IdentifyFromPoint:{e.Location},className:{uiObjectInfo.Item2}");
-            if (uiObjectInfo.Item1.IsEmpty)
+            AddLog($"identifyElement:{e.Location},className:{identifyElement.Item2}");
+            if (identifyElement.Item1.IsEmpty)
             {
                 _windowsHighlight.Hide();
                 return;
             }
 
-            _windowsHighlight.SetLocation(uiObjectInfo.Item1, uiObjectInfo.Item2);
+            _windowsHighlight.SetLocation(identifyElement.Item1, identifyElement.Item2);
         }
         catch (Exception ex)
         {
-            AddLog($"IdentifyFromPoint failed,error:{ex.Message}");
+            AddLog($"identifyElement failed,error:{ex.Message}");
         }
     }
 
