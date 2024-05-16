@@ -1,6 +1,8 @@
 using System.Windows.Automation;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
+using Tenon.Infra.Windows.Win32;
+using Tenon.Windows.UIA.Extensions;
 using Process = System.Diagnostics.Process;
 
 namespace UIRecorder;
@@ -24,9 +26,18 @@ public partial class MainForm : Form
         return await Task.Factory.StartNew(() =>
         {
             var point = new Point(location.X, location.Y);
+            var hWnd = Window.GetTop(point);
+            if (hWnd == IntPtr.Zero)
+                return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
+            var processId = Window.GetProcessId(hWnd);
+            var mainProcess = Process.GetProcessById((int)processId);
+            var processName = mainProcess.ProcessName;
             var automationElement =
                 AutomationElement.FromPoint(point);
-            if (automationElement == null) return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
+            if (processName.Equals("WeChat") || processName.Equals("WeChatApp"))
+                automationElement = FindChildDescendants(automationElement, point);
+            if (automationElement == null)
+                return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
             var rect = automationElement.Current.BoundingRectangle;
             var controlType =
                 (ControlType)automationElement.GetCurrentPropertyValue(AutomationElement.ControlTypeProperty, false);
@@ -81,5 +92,25 @@ public partial class MainForm : Form
     private void button4_Click(object sender, EventArgs e)
     {
         _windowsHighlightBehavior.Resume();
+    }
+
+    public AutomationElement FindChildDescendants(AutomationElement parent, Point location)
+    {
+        var elementCollection = AutomationElementExtension.GetChildren(parent);
+        foreach (var element in elementCollection)
+            if (element.Current.BoundingRectangle.Contains(location))
+            {
+                var identifyElement = FindChildDescendants(element, location);
+                if (identifyElement != null)
+                    return identifyElement;
+                var innerControlType =
+                    (ControlType)element.GetCurrentPropertyValue(AutomationElement.ControlTypeProperty, false);
+                if ((innerControlType != ControlType.Pane) & (innerControlType != ControlType.Window)
+                                                           & (innerControlType != ControlType.Custom))
+
+                    return element;
+            }
+
+        return null;
     }
 }

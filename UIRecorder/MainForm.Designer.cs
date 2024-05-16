@@ -31,12 +31,12 @@
             splitContainer1 = new SplitContainer();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
+            button4 = new Button();
             button3 = new Button();
             button2 = new Button();
             button1 = new Button();
             tabPage2 = new TabPage();
             listBox1 = new ListBox();
-            button4 = new Button();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -88,6 +88,16 @@
             tabPage1.Text = "Hook";
             tabPage1.UseVisualStyleBackColor = true;
             // 
+            // button4
+            // 
+            button4.Location = new Point(316, 41);
+            button4.Name = "button4";
+            button4.Size = new Size(75, 23);
+            button4.TabIndex = 4;
+            button4.Text = "Resume";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
+            // 
             // button3
             // 
             button3.Location = new Point(215, 41);
@@ -137,16 +147,6 @@
             listBox1.Name = "listBox1";
             listBox1.Size = new Size(800, 180);
             listBox1.TabIndex = 0;
-            // 
-            // button4
-            // 
-            button4.Location = new Point(316, 41);
-            button4.Name = "button4";
-            button4.Size = new Size(75, 23);
-            button4.TabIndex = 4;
-            button4.Text = "Resume";
-            button4.UseVisualStyleBackColor = true;
-            button4.Click += button4_Click;
             // 
             // MainForm
             // 
