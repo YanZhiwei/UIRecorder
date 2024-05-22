@@ -1,15 +1,18 @@
-using System.Windows.Automation;
+using FlaUI.Core;
+using FlaUI.Core.AutomationElements;
+using FlaUI.UIA3;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
-using Tenon.Infra.Windows.Win32;
-using Tenon.Windows.UIA.Extensions;
 using Process = System.Diagnostics.Process;
 
 namespace UIRecorder;
 
 public partial class MainForm : Form
 {
+    private readonly UIA3Automation _automation = new();
     private readonly string _processName;
+    private readonly AutomationElement _rootElement;
+    private readonly ITreeWalker _treeWalker;
     private readonly WindowsHighlightRectangle _windowsHighlight;
     private readonly WindowsHighlightBehavior _windowsHighlightBehavior;
 
@@ -19,6 +22,8 @@ public partial class MainForm : Form
         _windowsHighlightBehavior = new WindowsHighlightBehavior();
         _windowsHighlight = new WindowsHighlightRectangle();
         _processName = string.Concat(Process.GetCurrentProcess().ProcessName, ".exe");
+        _treeWalker = _automation.TreeWalkerFactory.GetControlViewWalker();
+        _rootElement = _automation.GetDesktop();
     }
 
     private async Task<Tuple<Rectangle, string>> ElementFromPointAsync(Point location)
@@ -26,23 +31,39 @@ public partial class MainForm : Form
         return await Task.Factory.StartNew(() =>
         {
             var point = new Point(location.X, location.Y);
-            var hWnd = Window.GetTop(point);
-            if (hWnd == IntPtr.Zero)
+            var hoveredElement =
+                _automation.FromPoint(point);
+            if (hoveredElement == null)
                 return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-            var processId = Window.GetProcessId(hWnd);
-            var mainProcess = Process.GetProcessById((int)processId);
-            var processName = mainProcess.ProcessName;
-            var automationElement =
-                AutomationElement.FromPoint(point);
-            if (processName.Equals("WeChat") || processName.Equals("WeChatApp"))
-                automationElement = FindChildDescendants(automationElement, point);
-            if (automationElement == null)
-                return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-            var rect = automationElement.Current.BoundingRectangle;
+            _treeWalker.GetParent(hoveredElement);
+            //ElementToSelectChanged(hoveredElement);
+            var processName = Process.GetProcessById(hoveredElement.Properties.ProcessId).ProcessName;
+            if (processName.Equals("WeChat") || processName.Equals("WeChatApp") || processName.Equals("DingTalk"))
+                hoveredElement = hoveredElement.FindChildDescendants(point) ?? hoveredElement;
+            var rect = hoveredElement.BoundingRectangle;
             var controlType =
-                (ControlType)automationElement.GetCurrentPropertyValue(AutomationElement.ControlTypeProperty, false);
-            return new Tuple<Rectangle, string>(rect, controlType?.ProgrammaticName?.Substring("ControlType.".Length));
+                hoveredElement.ControlType;
+            return new Tuple<Rectangle, string>(rect, controlType.ToString());
         });
+    }
+
+    private void ElementToSelectChanged(AutomationElement obj)
+    {
+        var pathToRoot = new Stack<AutomationElement>();
+        while (obj != null)
+        {
+            if (pathToRoot.Contains(obj) || obj.Equals(_rootElement)) break;
+
+            pathToRoot.Push(obj);
+            try
+            {
+                obj = _treeWalker.GetParent(obj);
+            }
+            catch (Exception ex)
+            {
+                // ignored
+            }
+        }
     }
 
     private void AddLog(string message)
@@ -92,25 +113,5 @@ public partial class MainForm : Form
     private void button4_Click(object sender, EventArgs e)
     {
         _windowsHighlightBehavior.Resume();
-    }
-
-    public AutomationElement FindChildDescendants(AutomationElement parent, Point location)
-    {
-        var elementCollection = AutomationElementExtension.GetChildren(parent);
-        foreach (var element in elementCollection)
-            if (element.Current.BoundingRectangle.Contains(location))
-            {
-                var identifyElement = FindChildDescendants(element, location);
-                if (identifyElement != null)
-                    return identifyElement;
-                var innerControlType =
-                    (ControlType)element.GetCurrentPropertyValue(AutomationElement.ControlTypeProperty, false);
-                if ((innerControlType != ControlType.Pane) & (innerControlType != ControlType.Window)
-                                                           & (innerControlType != ControlType.Custom))
-
-                    return element;
-            }
-
-        return null;
     }
 }
