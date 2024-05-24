@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Definitions;
 using FlaUI.UIA3;
 
 namespace UIRecorder.Models;
@@ -18,7 +19,7 @@ internal class UiaAccessibility : UiAccessibility
         Process = Process.GetProcessById(automationElement.Properties.ProcessId);
         Name = nameof(UiaAccessibility);
         Type = "UIA";
-        Version = "3";
+        Version = new Version(3, 0, 0);
         _treeWalker = _automation.TreeWalkerFactory.GetControlViewWalker();
         _rootElement = _automation.GetDesktop();
     }
@@ -34,6 +35,20 @@ internal class UiaAccessibility : UiAccessibility
             uiaElementPaths.Push(targetElement);
         }
 
+        AutomationElement parentElement = null;
+        while (uiaElementPaths.Count > 0)
+        {
+            parentElement = uiaElementPaths.Pop();
+            var controlType = parentElement.ControlType;
+            UiAccessibilityElement element = new UiAccessibilityElement();
+            switch (controlType)
+            {
+                case ControlType.Edit:
+                    element.Name = parentElement.Name;
+                    break;
+            }
+
+        }
         return null;
     }
 }

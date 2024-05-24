@@ -10,7 +10,7 @@ internal abstract class UiAccessibility
 
     public string Type { get; protected set; }
 
-    public string Version { get; protected set; }
+    public Version Version { get; protected set; }
 
     public abstract Stack<UiAccessibilityElement> GetElementStack();
 }

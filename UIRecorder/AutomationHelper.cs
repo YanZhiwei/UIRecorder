@@ -9,7 +9,7 @@ public static class AutomationHelper
     public static AutomationElement? FindChildDescendants(this AutomationElement parent, Point location)
     {
         // 获取所有子元素
-        var elementCollection = parent.FindAllChildren();//parent.GetChildren(); //
+        var elementCollection = parent.FindAllChildren(); //parent.GetChildren(); //
         foreach (var element in elementCollection)
             if (element.BoundingRectangle.Contains(location))
             {
@@ -35,5 +35,17 @@ public static class AutomationHelper
         if (!reverse)
             foreach (var e in element.FindAllChildren(TrueCondition.Default))
                 yield return e;
+    }
+
+    public static ControlType GetControlType(this AutomationElement element)
+    {
+        var controlType = element.ControlType;
+        if (controlType != ControlType.Unknown) return controlType;
+        var className = element.ClassName;
+        if (className.Equals("ApplicationBar", StringComparison.OrdinalIgnoreCase)) return ControlType.AppBar;
+
+        return className.Equals("SemanticZoom", StringComparison.OrdinalIgnoreCase)
+            ? ControlType.SemanticZoom
+            : ControlType.Custom;
     }
 }
