@@ -11,11 +11,10 @@
 
   <ItemGroup>
     <PackageReference Include="FlaUI.UIA3" Version="4.0.0" />
-    <PackageReference Include="OpenCvSharp4" Version="4.9.0.20240103" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.9.0.20240103" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.5" />
     <PackageReference Include="Tenon.Automation.Windows" Version="0.0.1-alpha-202405190458" />
     <PackageReference Include="Tenon.Infra.Windows.Form" Version="0.0.1-alpha-202405190458" />
+    <PackageReference Include="Tenon.Mapper.AutoMapper" Version="0.0.1-alpha-202405190458" />
   </ItemGroup>
 
 
