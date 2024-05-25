@@ -3,6 +3,7 @@ using FlaUI.Core.AutomationElements;
 using FlaUI.UIA3;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
+using UIRecorder.Models;
 using Process = System.Diagnostics.Process;
 
 namespace UIRecorder;
@@ -113,5 +114,20 @@ public partial class MainForm : Form
     private void button4_Click(object sender, EventArgs e)
     {
         _windowsHighlightBehavior.Resume();
+    }
+
+    private void button5_Click(object sender, EventArgs e)
+    {
+        var mainWindow = _rootElement.FindFirstChild(cf => cf.ByName("¼ÆËãÆ÷"));
+        if (mainWindow != null)
+        {
+            var button1 = mainWindow.FindFirstDescendant(cf => cf.ByName("Ò»"))?.AsButton();
+            if (button1 != null)
+            {
+                button1?.Invoke();
+                UiaAccessibility uiaAccessibility = new UiaAccessibility(button1);
+                uiaAccessibility.GetElementStack();
+            }
+        }
     }
 }
