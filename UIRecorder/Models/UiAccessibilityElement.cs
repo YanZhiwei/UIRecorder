@@ -10,7 +10,7 @@ internal class UiAccessibilityElement
 
     public UiAccessibilityControlType ControlType { get; set; }
 
-    public Rectangle BoundingRectangle { get; set; }
+    public UiAccessibilityElementBoundingRectangle BoundingRectangle { get; set; }
 
     public bool IsOffscreen { get; set; }
 
