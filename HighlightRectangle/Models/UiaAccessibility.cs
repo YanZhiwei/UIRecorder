@@ -6,7 +6,7 @@ using FlaUI.UIA3;
 using Tenon.Mapper.Abstractions;
 using Tenon.Serialization.Abstractions;
 
-namespace UIRecorder.Models;
+namespace HighlightRectangle.Models;
 
 internal class UiaAccessibility : UiAccessibility
 {

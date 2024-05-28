@@ -1,4 +1,4 @@
-﻿namespace UIRecorder.Models;
+﻿namespace HighlightRectangle.Models;
 
 /// <summary>
 ///     定义领域实体基类

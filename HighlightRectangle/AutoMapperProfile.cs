@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using AutoMapper.Extensions.EnumMapping;
-using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
-using UIRecorder.Models;
+using HighlightRectangle.Models;
 
-namespace UIRecorder;
+namespace HighlightRectangle;
 
 internal class AutoMapperProfile : Profile
 {

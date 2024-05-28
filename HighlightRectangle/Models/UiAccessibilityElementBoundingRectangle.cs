@@ -1,4 +1,4 @@
-﻿namespace UIRecorder.Models;
+﻿namespace HighlightRectangle.Models;
 
 public struct UiAccessibilityElementBoundingRectangle(Rectangle rect)
 {

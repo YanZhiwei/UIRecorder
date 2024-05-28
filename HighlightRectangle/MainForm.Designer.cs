@@ -1,4 +1,4 @@
-﻿namespace UIRecorder
+﻿namespace HighlightRectangle
 {
     partial class MainForm
     {

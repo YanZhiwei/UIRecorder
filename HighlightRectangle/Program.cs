@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tenon.Mapper.AutoMapper.Extensions;
 using Tenon.Serialization.Json.Extensions;
 
-namespace UIRecorder;
+namespace HighlightRectangle;
 
 internal static class Program
 {

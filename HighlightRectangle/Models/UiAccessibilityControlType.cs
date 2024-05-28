@@ -1,4 +1,4 @@
-﻿namespace UIRecorder.Models;
+﻿namespace HighlightRectangle.Models;
 
 /// <summary>
 /// https://learn.microsoft.com/zh-cn/windows/win32/winauto/uiauto-automation-element-propids

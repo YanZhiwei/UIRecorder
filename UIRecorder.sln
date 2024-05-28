@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIRecorder", "UIRecorder\UIRecorder.csproj", "{DFD4ACDB-075E-4B9F-AB42-2BC8B1C8A9C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HighlightRectangle", "HighlightRectangle\HighlightRectangle.csproj", "{53F2854B-EA89-48DE-90EB-8E66E7929395}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DFD4ACDB-075E-4B9F-AB42-2BC8B1C8A9C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DFD4ACDB-075E-4B9F-AB42-2BC8B1C8A9C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DFD4ACDB-075E-4B9F-AB42-2BC8B1C8A9C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DFD4ACDB-075E-4B9F-AB42-2BC8B1C8A9C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53F2854B-EA89-48DE-90EB-8E66E7929395}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53F2854B-EA89-48DE-90EB-8E66E7929395}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53F2854B-EA89-48DE-90EB-8E66E7929395}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53F2854B-EA89-48DE-90EB-8E66E7929395}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

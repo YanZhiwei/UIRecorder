@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace UIRecorder.Models;
+namespace HighlightRectangle.Models;
 
 internal abstract class UiAccessibility
 {

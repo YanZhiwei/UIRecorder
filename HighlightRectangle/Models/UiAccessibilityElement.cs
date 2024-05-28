@@ -1,6 +1,4 @@
-﻿using FlaUI.Core.AutomationElements;
-
-namespace UIRecorder.Models;
+﻿namespace HighlightRectangle.Models;
 
 internal class UiAccessibilityElement
 {

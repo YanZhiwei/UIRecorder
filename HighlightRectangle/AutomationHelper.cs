@@ -2,7 +2,7 @@
 using FlaUI.Core.Conditions;
 using FlaUI.Core.Definitions;
 
-namespace UIRecorder;
+namespace HighlightRectangle;
 
 public static class AutomationHelper
 {
