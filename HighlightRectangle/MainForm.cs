@@ -12,14 +12,15 @@ namespace HighlightRectangle;
 
 public partial class MainForm : Form
 {
-    private readonly ISerializer _serializer;
     private readonly UIA3Automation _automation = new();
-    private readonly string _processName;
+    private readonly string[] _ignoreProcessNames;
+    private readonly IObjectMapper _mapper;
     private readonly AutomationElement _rootElement;
+    private readonly ISerializer _serializer;
     private readonly ITreeWalker _treeWalker;
     private readonly WindowsHighlightRectangle _windowsHighlight;
     private readonly WindowsHighlightBehavior _windowsHighlightBehavior;
-    private readonly IObjectMapper _mapper;
+
     public MainForm(ISerializer serializer, IObjectMapper mapper)
     {
         _serializer = serializer;
@@ -27,7 +28,7 @@ public partial class MainForm : Form
         InitializeComponent();
         _windowsHighlightBehavior = new WindowsHighlightBehavior();
         _windowsHighlight = new WindowsHighlightRectangle();
-        _processName = string.Concat(Process.GetCurrentProcess().ProcessName, ".exe");
+        _ignoreProcessNames = [Process.GetCurrentProcess().ProcessName];
         _treeWalker = _automation.TreeWalkerFactory.GetControlViewWalker();
         _rootElement = _automation.GetDesktop();
     }
@@ -42,8 +43,9 @@ public partial class MainForm : Form
             if (hoveredElement == null)
                 return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
             _treeWalker.GetParent(hoveredElement);
-            //ElementToSelectChanged(hoveredElement);
             var processName = Process.GetProcessById(hoveredElement.Properties.ProcessId).ProcessName;
+            if (_ignoreProcessNames.Contains(processName, StringComparer.OrdinalIgnoreCase))
+                return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
             if (processName.Equals("WeChat") || processName.Equals("WeChatApp") || processName.Equals("DingTalk"))
                 hoveredElement = hoveredElement.FindChildDescendants(point) ?? hoveredElement;
             var rect = hoveredElement.BoundingRectangle;
@@ -130,7 +132,7 @@ public partial class MainForm : Form
             if (button1 != null)
             {
                 button1?.Invoke();
-                UiaAccessibility uiaAccessibility = new UiaAccessibility(button1, _serializer, _mapper);
+                var uiaAccessibility = new UiaAccessibility(button1, _serializer, _mapper);
                 uiaAccessibility.GetElementStack();
             }
         }
