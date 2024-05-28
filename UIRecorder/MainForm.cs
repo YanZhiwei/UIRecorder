@@ -3,6 +3,8 @@ using FlaUI.Core.AutomationElements;
 using FlaUI.UIA3;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
+using Tenon.Mapper.Abstractions;
+using Tenon.Serialization.Abstractions;
 using UIRecorder.Models;
 using Process = System.Diagnostics.Process;
 
@@ -10,15 +12,18 @@ namespace UIRecorder;
 
 public partial class MainForm : Form
 {
+    private readonly ISerializer _serializer;
     private readonly UIA3Automation _automation = new();
     private readonly string _processName;
     private readonly AutomationElement _rootElement;
     private readonly ITreeWalker _treeWalker;
     private readonly WindowsHighlightRectangle _windowsHighlight;
     private readonly WindowsHighlightBehavior _windowsHighlightBehavior;
-
-    public MainForm()
+    private readonly IObjectMapper _mapper;
+    public MainForm(ISerializer serializer, IObjectMapper mapper)
     {
+        _serializer = serializer;
+        _mapper = mapper;
         InitializeComponent();
         _windowsHighlightBehavior = new WindowsHighlightBehavior();
         _windowsHighlight = new WindowsHighlightRectangle();
@@ -125,7 +130,7 @@ public partial class MainForm : Form
             if (button1 != null)
             {
                 button1?.Invoke();
-                UiaAccessibility uiaAccessibility = new UiaAccessibility(button1);
+                UiaAccessibility uiaAccessibility = new UiaAccessibility(button1, _serializer, _mapper);
                 uiaAccessibility.GetElementStack();
             }
         }

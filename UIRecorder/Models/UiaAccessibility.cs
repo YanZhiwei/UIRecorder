@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
-using FlaUI.Core.Definitions;
 using FlaUI.UIA3;
+using Tenon.Mapper.Abstractions;
+using Tenon.Serialization.Abstractions;
 
 namespace UIRecorder.Models;
 
@@ -10,12 +11,15 @@ internal class UiaAccessibility : UiAccessibility
 {
     private readonly UIA3Automation _automation = new();
     private readonly AutomationElement _rootElement;
+    private readonly ISerializer _serializer;
     private readonly AutomationElement _targetElement;
     private readonly ITreeWalker _treeWalker;
-
-    public UiaAccessibility(AutomationElement automationElement)
+    private readonly IObjectMapper _mapper;
+    public UiaAccessibility(AutomationElement automationElement, ISerializer serializer, IObjectMapper mapper)
     {
         _targetElement = automationElement ?? throw new ArgumentNullException(nameof(automationElement));
+        _serializer = serializer;
+        _mapper = mapper;
         Process = Process.GetProcessById(automationElement.Properties.ProcessId);
         Name = nameof(UiaAccessibility);
         Type = "UIA";
@@ -26,29 +30,36 @@ internal class UiaAccessibility : UiAccessibility
 
     public override Stack<UiAccessibilityElement> GetElementStack()
     {
-        var uiaElementPaths = new Stack<AutomationElement>();
+        var uiaElementPaths = new Stack<UiAccessibilityElement>();
         var targetElement = _targetElement;
-        uiaElementPaths.Push(targetElement);
+        uiaElementPaths.Push(DtoAccessibilityElement(targetElement));
         while (targetElement.Parent != null && targetElement.Parent != _rootElement)
         {
             targetElement = _treeWalker.GetParent(targetElement);
-            uiaElementPaths.Push(targetElement);
+            uiaElementPaths.Push(DtoAccessibilityElement(targetElement));
         }
+        var json = _serializer.SerializeObject(uiaElementPaths);
+        return uiaElementPaths;
+    }
 
-        AutomationElement parentElement = null;
-        while (uiaElementPaths.Count > 0)
+    protected override UiAccessibilityElement DtoAccessibilityElement(object element)
+    {
+        if (element is AutomationElement automationElement)
         {
-            parentElement = uiaElementPaths.Pop();
-            var controlType = parentElement.ControlType;
-            UiAccessibilityElement element = new UiAccessibilityElement();
-            switch (controlType)
+            var uiAccessibilityElement = new UiAccessibilityElement
             {
-                case ControlType.Edit:
-                    element.Name = parentElement.Name;
-                    break;
-            }
-
+                Name = automationElement.Properties.Name.ValueOrDefault,
+                ActualWidth = automationElement.ActualHeight
+            };
+            uiAccessibilityElement.ActualWidth = automationElement.ActualWidth;
+            uiAccessibilityElement.BoundingRectangle = automationElement.BoundingRectangle;
+            uiAccessibilityElement.Id = automationElement.Properties.AutomationId.ValueOrDefault;
+            uiAccessibilityElement.IsEnabled = automationElement.Properties.IsEnabled.ValueOrDefault;
+            uiAccessibilityElement.IsOffscreen = automationElement.Properties.IsOffscreen.ValueOrDefault;
+            uiAccessibilityElement.IsDialog = automationElement.Properties.IsDialog.ValueOrDefault;
+            return uiAccessibilityElement;
         }
+
         return null;
     }
 }

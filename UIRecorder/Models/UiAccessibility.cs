@@ -13,4 +13,8 @@ internal abstract class UiAccessibility
     public Version Version { get; protected set; }
 
     public abstract Stack<UiAccessibilityElement> GetElementStack();
+
+    public UiAccessibilityElement[] Child { get; protected set; }
+
+    protected abstract UiAccessibilityElement DtoAccessibilityElement(object element);
 }
