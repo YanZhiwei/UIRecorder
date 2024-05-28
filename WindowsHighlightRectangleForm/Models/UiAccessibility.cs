@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace HighlightRectangle.Models;
+namespace WindowsHighlightRectangleForm.Models;
 
 internal abstract class UiAccessibility
 {

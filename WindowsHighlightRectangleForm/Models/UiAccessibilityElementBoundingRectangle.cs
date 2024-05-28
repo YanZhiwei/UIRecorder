@@ -1,4 +1,4 @@
-﻿namespace HighlightRectangle.Models;
+﻿namespace WindowsHighlightRectangleForm.Models;
 
 public struct UiAccessibilityElementBoundingRectangle(Rectangle rect)
 {

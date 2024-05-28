@@ -1,4 +1,4 @@
-﻿namespace HighlightRectangle.Models;
+﻿namespace WindowsHighlightRectangleForm.Models;
 
 /// <summary>
 ///     定义领域实体基类

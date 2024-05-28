@@ -1,14 +1,14 @@
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.UIA3;
-using HighlightRectangle.Models;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
 using Tenon.Mapper.Abstractions;
 using Tenon.Serialization.Abstractions;
+using WindowsHighlightRectangleForm.Models;
 using Process = System.Diagnostics.Process;
 
-namespace HighlightRectangle;
+namespace WindowsHighlightRectangleForm;
 
 public partial class MainForm : Form
 {

@@ -1,4 +1,4 @@
-﻿namespace HighlightRectangle.Models;
+﻿namespace WindowsHighlightRectangleForm.Models;
 
 /// <summary>
 /// https://learn.microsoft.com/zh-cn/windows/win32/winauto/uiauto-automation-element-propids

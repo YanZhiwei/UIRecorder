@@ -1,4 +1,4 @@
-﻿namespace HighlightRectangle
+﻿namespace WindowsHighlightRectangleForm
 {
     partial class MainForm
     {

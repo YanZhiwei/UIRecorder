@@ -2,7 +2,7 @@
 using FlaUI.Core.Conditions;
 using FlaUI.Core.Definitions;
 
-namespace HighlightRectangle;
+namespace WindowsHighlightRectangleForm;
 
 public static class AutomationHelper
 {

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using AutoMapper.Extensions.EnumMapping;
 using FlaUI.Core.Definitions;
-using HighlightRectangle.Models;
+using WindowsHighlightRectangleForm.Models;
 
-namespace HighlightRectangle;
+namespace WindowsHighlightRectangleForm;
 
 internal class AutoMapperProfile : Profile
 {
