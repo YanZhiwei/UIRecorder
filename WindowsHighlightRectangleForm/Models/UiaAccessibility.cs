@@ -5,6 +5,7 @@ using FlaUI.Core.Definitions;
 using FlaUI.UIA3;
 using Tenon.Mapper.Abstractions;
 using Tenon.Serialization.Abstractions;
+using Debug = System.Diagnostics.Debug;
 
 namespace WindowsHighlightRectangleForm.Models;
 
@@ -30,15 +31,19 @@ internal class UiaAccessibility : UiAccessibility
         _rootElement = _automation.GetDesktop();
     }
 
-    public override Stack<UiAccessibilityElement> GetElementStack()
+    public override DistinctStack<UiAccessibilityElement> GetElementStack()
     {
-        var uiaElementPaths = new Stack<UiAccessibilityElement>();
+        var uiaElementPaths = new DistinctStack<UiAccessibilityElement>();
         var targetElement = _targetElement;
         uiaElementPaths.Push(DtoAccessibilityElement(targetElement));
-        while (targetElement.Parent != null && targetElement.Parent != _rootElement)
+        while (targetElement.Parent != null)
         {
+            if (targetElement.Parent.Equals(_rootElement))
+                break;
             targetElement = _treeWalker.GetParent(targetElement);
-            uiaElementPaths.Push(DtoAccessibilityElement(targetElement));
+            var standardElement = DtoAccessibilityElement(targetElement);
+            Debug.WriteLine(standardElement.GetHashCode());
+            uiaElementPaths.Push(standardElement);
         }
 
         var json = _serializer.SerializeObject(uiaElementPaths);

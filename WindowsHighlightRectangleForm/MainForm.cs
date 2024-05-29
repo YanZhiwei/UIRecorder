@@ -83,7 +83,16 @@ public partial class MainForm : Form
     private void button1_Click(object sender, EventArgs e)
     {
         _windowsHighlightBehavior.MouseMoveEventHandler += IdentifyFromPoint;
+        _windowsHighlightBehavior.KeyDownEventHandler += KeyDownEventHandler;
         _windowsHighlightBehavior.Start();
+    }
+
+    private void KeyDownEventHandler(object? sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.LControlKey)
+        {
+            AddLog("get locator");
+        }
     }
 
     private void IdentifyFromPoint(object? sender, MouseEventArgs e)
@@ -110,6 +119,7 @@ public partial class MainForm : Form
     private void button2_Click(object sender, EventArgs e)
     {
         _windowsHighlightBehavior.MouseMoveEventHandler -= IdentifyFromPoint;
+        _windowsHighlightBehavior.KeyDownEventHandler -= KeyDownEventHandler;
         _windowsHighlightBehavior.Stop();
     }
 

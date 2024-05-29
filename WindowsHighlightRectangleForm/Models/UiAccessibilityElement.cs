@@ -1,24 +1,29 @@
-﻿namespace WindowsHighlightRectangleForm.Models;
+﻿using System.Text.Json.Serialization;
 
-internal class UiAccessibilityElement
+namespace WindowsHighlightRectangleForm.Models;
+
+public class UiAccessibilityElement
 {
-    //public AutomationElement[] Child { get; set; }
-
     public string Name { get; set; }
 
     public UiAccessibilityControlType ControlType { get; set; }
 
-    public UiAccessibilityElementBoundingRectangle BoundingRectangle { get; set; }
+    [JsonIgnore] public UiAccessibilityElementBoundingRectangle BoundingRectangle { get; set; }
 
-    public bool IsOffscreen { get; set; }
+    [JsonIgnore] public bool IsOffscreen { get; set; }
 
-    public bool IsEnabled { get; set; }
+    [JsonIgnore] public bool IsEnabled { get; set; }
 
-    public double ActualHeight { get; set; }
+    [JsonIgnore] public double ActualHeight { get; set; }
 
-    public double ActualWidth { get; set; }
+    [JsonIgnore] public double ActualWidth { get; set; }
 
     public bool IsDialog { get; set; }
 
     public string Id { get; set; }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, Name, ControlType, IsDialog);
+    }
 }

@@ -3,7 +3,7 @@
 /// <summary>
 /// https://learn.microsoft.com/zh-cn/windows/win32/winauto/uiauto-automation-element-propids
 /// </summary>
-internal enum UiAccessibilityControlType
+public enum UiAccessibilityControlType
 {
     /// <summary>Identifies an unknown control type.</summary>
     Unknown,
