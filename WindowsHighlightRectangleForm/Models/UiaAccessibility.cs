@@ -59,7 +59,7 @@ internal class UiaAccessibility : UiAccessibility
                 Name = automationElement.Properties.Name.ValueOrDefault,
                 ActualWidth = automationElement.ActualWidth,
                 ActualHeight = automationElement.ActualHeight,
-                BoundingRectangle = new UiAccessibilityElementBoundingRectangle(automationElement.BoundingRectangle),
+                BoundingRectangle = automationElement.BoundingRectangle,
                 Id = automationElement.Properties.AutomationId.ValueOrDefault,
                 IsEnabled = automationElement.Properties.IsEnabled.ValueOrDefault,
                 IsOffscreen = automationElement.Properties.IsOffscreen.ValueOrDefault,

@@ -8,7 +8,7 @@ public class UiAccessibilityElement
 
     public UiAccessibilityControlType ControlType { get; set; }
 
-    [JsonIgnore] public UiAccessibilityElementBoundingRectangle BoundingRectangle { get; set; }
+    [JsonIgnore] public Rectangle BoundingRectangle { get; set; }
 
     [JsonIgnore] public bool IsOffscreen { get; set; }
 
