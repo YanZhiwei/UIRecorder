@@ -4,6 +4,7 @@ using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.UIA3;
+using Tenon.Helper.Internal;
 
 namespace WindowsHighlightRectangleForm.Models;
 
@@ -17,7 +18,8 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
 
     static UiaAccessibilityIdentity()
     {
-        AppAccessibilityIdentities = CreateAppAccessibilityIdentityInstances<IUiaAppAccessibilityIdentity>()
+        AppAccessibilityIdentities = ReflectHelper
+            .CreateInterfaceTypeInstances<IUiaAppAccessibilityIdentity>(Assembly.GetExecutingAssembly())
             .ToDictionary(key => key.IdentityString, value => value);
     }
 
@@ -26,32 +28,6 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
         _treeWalker = _automation.TreeWalkerFactory.GetControlViewWalker();
         _rootElement = _automation.GetDesktop();
         Priority = UiAccessibilityIdentityPriority.Highest;
-    }
-
-    private static IEnumerable<T> CreateAppAccessibilityIdentityInstances<T>() where T : class
-    {
-        var interfaceType = typeof(T);
-        var implementingTypes = GetImplementingTypes(interfaceType, Assembly.GetExecutingAssembly());
-
-        var instances = new List<T>();
-
-        foreach (var type in implementingTypes)
-            if (Activator.CreateInstance(type) is T instance)
-                instances.Add(instance);
-
-        return instances;
-    }
-
-
-    private static List<Type> GetImplementingTypes(Type interfaceType, Assembly assembly)
-    {
-        var types = assembly.GetTypes();
-
-        var implementingTypes = types
-            .Where(t => interfaceType.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
-            .ToList();
-
-        return implementingTypes;
     }
 
     public override UiAccessibilityElement? FromPoint(Point location)
