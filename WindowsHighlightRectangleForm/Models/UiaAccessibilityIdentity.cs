@@ -1,4 +1,6 @@
-﻿using FlaUI.Core;
+﻿using System.Diagnostics;
+using System.Reflection;
+using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.UIA3;
@@ -7,37 +9,71 @@ namespace WindowsHighlightRectangleForm.Models;
 
 public class UiaAccessibilityIdentity : UiAccessibilityIdentity
 {
-    protected readonly UIA3Automation Automation = new();
-    protected readonly AutomationElement RootElement;
-    protected readonly ITreeWalker TreeWalker;
+    private static readonly Dictionary<string, IUiaAppAccessibilityIdentity> AppAccessibilityIdentities;
+
+    private readonly UIA3Automation _automation = new();
+    private readonly AutomationElement _rootElement;
+    private readonly ITreeWalker _treeWalker;
+
+    static UiaAccessibilityIdentity()
+    {
+        AppAccessibilityIdentities = CreateAppAccessibilityIdentityInstances<IUiaAppAccessibilityIdentity>()
+            .ToDictionary(key => key.IdentityString, value => value);
+    }
 
     public UiaAccessibilityIdentity()
     {
-        TreeWalker = Automation.TreeWalkerFactory.GetControlViewWalker();
-        RootElement = Automation.GetDesktop();
+        _treeWalker = _automation.TreeWalkerFactory.GetControlViewWalker();
+        _rootElement = _automation.GetDesktop();
         Priority = UiAccessibilityIdentityPriority.Highest;
     }
 
-    public override AutomationElement? FromPoint(int x, int y)
+    private static IEnumerable<T> CreateAppAccessibilityIdentityInstances<T>() where T : class
     {
-        var hoveredElement = GetHoveredElement(x, y);
-        if (hoveredElement is not AutomationElement automationElement) return null;
-        return automationElement;
+        var interfaceType = typeof(T);
+        var implementingTypes = GetImplementingTypes(interfaceType, Assembly.GetExecutingAssembly());
+
+        var instances = new List<T>();
+
+        foreach (var type in implementingTypes)
+            if (Activator.CreateInstance(type) is T instance)
+                instances.Add(instance);
+
+        return instances;
     }
 
-    public override object? GetHoveredElement(int x, int y)
+
+    private static List<Type> GetImplementingTypes(Type interfaceType, Assembly assembly)
     {
-        var location = new Point(x, x);
-        if (location.IsEmpty) return null;
+        var types = assembly.GetTypes();
+
+        var implementingTypes = types
+            .Where(t => interfaceType.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
+            .ToList();
+
+        return implementingTypes;
+    }
+
+    public override UiAccessibilityElement? FromPoint(Point location)
+    {
         var hoveredElement =
-            Automation.FromPoint(location);
-        return hoveredElement;
+            _automation.FromPoint(location);
+        if (hoveredElement == null) return null;
+        _treeWalker.GetParent(hoveredElement);
+        var processName = Process.GetProcessById(hoveredElement.Properties.ProcessId).ProcessName;
+        var findKey =
+            AppAccessibilityIdentities.Keys.FirstOrDefault(c =>
+                c.Contains(processName, StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrEmpty(findKey))
+            hoveredElement = AppAccessibilityIdentities[findKey]
+                .FromHoveredElement(location, hoveredElement, _treeWalker);
+        return DtoAccessibilityElement(hoveredElement);
     }
 
-    public override AutomationElement? DtoAccessibilityElement(object element)
+    public override UiAccessibilityElement? DtoAccessibilityElement(object element)
     {
         if (element is not AutomationElement automationElement) return null;
-        var uiAccessibilityElement = new UiAccessibilityElement
+        return new UiAccessibilityElement
         {
             Name = automationElement.Properties.Name.ValueOrDefault,
             ActualWidth = automationElement.ActualWidth,
@@ -92,7 +128,5 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
                 _ => UiAccessibilityControlType.Unknown
             }
         };
-
-        return null;
     }
 }

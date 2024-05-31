@@ -7,13 +7,11 @@ using Tenon.Mapper.Abstractions;
 using Tenon.Serialization.Abstractions;
 using WindowsHighlightRectangleForm.Models;
 using Process = System.Diagnostics.Process;
-using Window = Tenon.Infra.Windows.Win32.Window;
 
 namespace WindowsHighlightRectangleForm;
 
 public partial class MainForm : Form
 {
-    private readonly Dictionary<string, UiAccessibilityIdentity> _accessibilityIdentities;
     private readonly UIA3Automation _automation = new();
     private readonly UiAccessibilityIdentity _defaultAccessibilityIdentity;
     private readonly string[] _ignoreProcessNames;
@@ -21,7 +19,6 @@ public partial class MainForm : Form
     private readonly AutomationElement _rootElement;
     private readonly ISerializer _serializer;
     private readonly ITreeWalker _treeWalker;
-    private readonly UiAccessibilityIdentity _weChatAccessibilityIdentity;
     private readonly WindowsHighlightRectangle _windowsHighlight;
     private readonly WindowsHighlightBehavior _windowsHighlightBehavior;
 
@@ -35,70 +32,16 @@ public partial class MainForm : Form
         _ignoreProcessNames = [Process.GetCurrentProcess().ProcessName];
         _treeWalker = _automation.TreeWalkerFactory.GetControlViewWalker();
         _rootElement = _automation.GetDesktop();
-        _accessibilityIdentities = CreateUiAccessibilityIdentityInstances<UiAccessibilityIdentity>()
-            .ToDictionary(key => key.ProcessName, value => value);
-        _defaultAccessibilityIdentity = _accessibilityIdentities["*"];
-        _weChatAccessibilityIdentity = _accessibilityIdentities["WeChat"];
+        _defaultAccessibilityIdentity = new UiaAccessibilityIdentity();
     }
-
-    //private async Task<Tuple<Rectangle, string>> ElementFromPointAsync(Point location)
-    //{
-    //    //var hoveredPoint = new Point(location.X, location.Y);
-    //    //var windowTopHWnd = Window.GetTop(hoveredPoint);
-    //    //if (windowTopHWnd == IntPtr.Zero)
-    //    //    return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-    //    //var processId = Window.GetProcessId(windowTopHWnd);
-    //    //if (processId == IntPtr.Zero)
-    //    //    return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-    //    //var hoveredProcess = Process.GetProcessById((int)processId);
-    //    return await Task.Factory.StartNew(() =>
-    //    {
-    //        var point = new Point(location.X, location.Y);
-    //        var element =
-    //            _automation.FromPoint(point);
-    //        if (element == null)
-    //            return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-    //        AutomationElement? hoveredElement = null;
-    //        var hoveredProcess = Process.GetProcessById(element.Properties.ProcessId);
-    //        //if (_accessibilityIdentities.TryGetValue(hoveredProcess.ProcessName, out var uiAccessibilityIdentity))
-    //        //    hoveredElement = uiAccessibilityIdentity.FromPoint(location.X, location.Y);
-    //        //else
-    //            hoveredElement = _defaultAccessibilityIdentity.FromPoint(location.X, location.Y);
-    //        if (hoveredElement == null)
-    //            return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-    //        return new Tuple<Rectangle, string>(hoveredElement.BoundingRectangle,
-    //            hoveredElement.ControlType.ToString());
-    //    });
-    //}
 
     private async Task<Tuple<Rectangle, string>> ElementFromPointAsync(Point location)
     {
         return await Task.Factory.StartNew(() =>
         {
-            var point = new Point(location.X, location.Y);
-            var hoveredElement =
-                _automation.FromPoint(point);
+            var hoveredElement = _defaultAccessibilityIdentity.FromPoint(location);
             if (hoveredElement == null)
                 return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-            _treeWalker.GetParent(hoveredElement);
-            var processName = Process.GetProcessById(hoveredElement.Properties.ProcessId).ProcessName;
-            //var hoveredPoint = new Point(location.X, location.Y);
-            //var windowTopHWnd = Window.GetTop(hoveredPoint);
-            //if (windowTopHWnd == IntPtr.Zero)
-            //    return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-            //var processId = Window.GetProcessId(windowTopHWnd);
-            //if (processId == IntPtr.Zero)
-            //    return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-            //var processName = Process.GetProcessById((int)processId).ProcessName;
-            //if (_ignoreProcessNames.Contains(processName, StringComparer.OrdinalIgnoreCase))
-            //    return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
-            //var hoveredElement = _defaultAccessibilityIdentity.FromPoint(location.X, location.Y);
-            //if (hoveredElement != null)
-            //    return new Tuple<Rectangle, string>(hoveredElement.BoundingRectangle,
-            //        hoveredElement.ControlType.ToString());
-            if (processName.Equals("WeChat") || processName.Equals("WeChatApp") || processName.Equals("DingTalk"))
-                // hoveredElement = hoveredElement.FindChildDescendants(point) ?? hoveredElement;
-                hoveredElement = _weChatAccessibilityIdentity.FromPoint(location.X, location.Y) ?? hoveredElement;
             var rect = hoveredElement.BoundingRectangle;
             var controlType =
                 hoveredElement.ControlType;
@@ -147,8 +90,7 @@ public partial class MainForm : Form
     {
         try
         {
-            var identifyElement = ElementFromPointAsync(e.Location).ConfigureAwait(false).GetAwaiter()
-                .GetResult();
+            var identifyElement = ElementFromPointAsync(e.Location).ConfigureAwait(false).GetAwaiter().GetResult();
             AddLog($"identifyElement:{e.Location},className:{identifyElement.Item2}");
             if (identifyElement.Item1.IsEmpty)
             {
@@ -191,7 +133,7 @@ public partial class MainForm : Form
             {
                 button1?.Invoke();
                 var uiaAccessibility = new UiaAccessibility(button1, _serializer, _mapper);
-                uiaAccessibility.GetElementStack();
+               // uiaAccessibility.Snapshotting();
             }
         }
     }

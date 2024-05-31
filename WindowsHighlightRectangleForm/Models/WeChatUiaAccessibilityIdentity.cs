@@ -1,21 +1,46 @@
-﻿using FlaUI.Core.AutomationElements;
+﻿using FlaUI.Core;
+using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Definitions;
 
 namespace WindowsHighlightRectangleForm.Models;
 
-public sealed class WeChatUiaAccessibilityIdentity : UiaAccessibilityIdentity
+public sealed class WeChatUiaAccessibilityIdentity : IUiaAppAccessibilityIdentity
 {
     public WeChatUiaAccessibilityIdentity()
     {
-        ProcessName = "WeChat";
+        SupportProcessNames = ["WeChat", "WeChatApp"];
+        IdentityString = string.Join(",", SupportProcessNames);
     }
 
-    public override AutomationElement? FromPoint(int x, int y)
+    public string[] SupportProcessNames { get; }
+    public string IdentityString { get; }
+
+    public AutomationElement? FromHoveredElement(Point location, AutomationElement hoveredElement,
+        ITreeWalker treeWalker)
     {
-        var hoveredElement = GetHoveredElement(x, y);
-        if (hoveredElement is not AutomationElement automationElement) return null;
-        TreeWalker.GetParent(automationElement);
-        automationElement = automationElement.FindChildDescendants(new Point(x, y)) ?? automationElement;
-        return automationElement;
-        //return DtoAccessibilityElement(automationElement);
+        return FindChildDescendants(hoveredElement, location);
+    }
+
+    private AutomationElement? FindChildDescendants(AutomationElement parent, Point location)
+    {
+        // 获取所有子元素
+        var elementCollection = parent.FindAllChildren(); //parent.GetChildren(); //
+        foreach (var element in elementCollection)
+            if (element.BoundingRectangle.Contains(location))
+            {
+                // 递归查找子元素
+                var identifyElement = FindChildDescendants(element, location);
+                if (identifyElement != null)
+                    return identifyElement;
+
+                // 检查控件类型
+                var innerControlType = element.ControlType;
+                if (innerControlType != ControlType.Pane &&
+                    innerControlType != ControlType.Window &&
+                    innerControlType != ControlType.Custom)
+                    return element;
+            }
+
+        return null;
     }
 }

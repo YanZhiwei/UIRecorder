@@ -31,7 +31,7 @@ internal class UiaAccessibility : UiAccessibility
         _rootElement = _automation.GetDesktop();
     }
 
-    public override DistinctStack<UiAccessibilityElement> GetElementStack()
+    public override DistinctStack<UiAccessibilityElement> Snapshotting(UiAccessibilityElement element)
     {
         var uiaElementPaths = new DistinctStack<UiAccessibilityElement>();
         var targetElement = _targetElement;
@@ -50,7 +50,7 @@ internal class UiaAccessibility : UiAccessibility
         return uiaElementPaths;
     }
 
-    protected override UiAccessibilityElement DtoAccessibilityElement(object element)
+    protected UiAccessibilityElement DtoAccessibilityElement(object element)
     {
         if (element is AutomationElement automationElement)
         {
