@@ -1,6 +1,4 @@
-using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
-using FlaUI.UIA3;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
 using Tenon.Mapper.Abstractions;
@@ -12,34 +10,34 @@ namespace WindowsHighlightRectangleForm;
 
 public partial class MainForm : Form
 {
-    private readonly UIA3Automation _automation = new();
-    private readonly UiAccessibilityIdentity _defaultAccessibilityIdentity;
     private readonly string[] _ignoreProcessNames;
     private readonly IObjectMapper _mapper;
-    private readonly AutomationElement _rootElement;
     private readonly ISerializer _serializer;
-    private readonly ITreeWalker _treeWalker;
+    private readonly UiaAccessibilityIdentity _uiaAccessibilityIdentity;
+    private readonly UiAccessibility _uiAccessibility;
+    private readonly UiAccessibilityIdentity _uiAccessibilityIdentity;
     private readonly WindowsHighlightRectangle _windowsHighlight;
     private readonly WindowsHighlightBehavior _windowsHighlightBehavior;
 
-    public MainForm(ISerializer serializer, IObjectMapper mapper)
+    public MainForm(UiAccessibility uiAccessibility, UiAccessibilityIdentity uiAccessibilityIdentity,
+        ISerializer serializer, IObjectMapper mapper, UiaAccessibilityIdentity uiaAccessibilityIdentity)
     {
+        _uiAccessibility = uiAccessibility;
+        _uiAccessibilityIdentity = uiAccessibilityIdentity;
         _serializer = serializer;
         _mapper = mapper;
+        _uiaAccessibilityIdentity = uiaAccessibilityIdentity;
         InitializeComponent();
         _windowsHighlightBehavior = new WindowsHighlightBehavior();
         _windowsHighlight = new WindowsHighlightRectangle();
         _ignoreProcessNames = [Process.GetCurrentProcess().ProcessName];
-        _treeWalker = _automation.TreeWalkerFactory.GetControlViewWalker();
-        _rootElement = _automation.GetDesktop();
-        _defaultAccessibilityIdentity = new UiaAccessibilityIdentity();
     }
 
     private async Task<Tuple<Rectangle, string>> ElementFromPointAsync(Point location)
     {
         return await Task.Factory.StartNew(() =>
         {
-            var hoveredElement = _defaultAccessibilityIdentity.FromPoint(location);
+            var hoveredElement = _uiAccessibilityIdentity.FromPoint(location);
             if (hoveredElement == null)
                 return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
             var rect = hoveredElement.BoundingRectangle;
@@ -49,24 +47,6 @@ public partial class MainForm : Form
         });
     }
 
-    private void ElementToSelectChanged(AutomationElement obj)
-    {
-        var pathToRoot = new Stack<AutomationElement>();
-        while (obj != null)
-        {
-            if (pathToRoot.Contains(obj) || obj.Equals(_rootElement)) break;
-
-            pathToRoot.Push(obj);
-            try
-            {
-                obj = _treeWalker.GetParent(obj);
-            }
-            catch (Exception ex)
-            {
-                // ignored
-            }
-        }
-    }
 
     private void AddLog(string message)
     {
@@ -125,49 +105,15 @@ public partial class MainForm : Form
 
     private void button5_Click(object sender, EventArgs e)
     {
-        var mainWindow = _rootElement.FindFirstChild(cf => cf.ByName("¼ÆËãÆ÷"));
+        var mainWindow = _uiaAccessibilityIdentity.RootElement.FindFirstChild(cf => cf.ByName("¼ÆËãÆ÷"));
         if (mainWindow != null)
         {
             var button1 = mainWindow.FindFirstDescendant(cf => cf.ByName("Ò»"))?.AsButton();
             if (button1 != null)
             {
                 button1?.Invoke();
-                var uiaAccessibility = new UiaAccessibility(button1, _serializer, _mapper);
-               // uiaAccessibility.Snapshotting();
+                _uiAccessibility.Record(button1);
             }
         }
-    }
-
-    private void button6_Click(object sender, EventArgs e)
-    {
-        var derivedInstances = CreateUiAccessibilityIdentityInstances<UiAccessibilityIdentity>();
-
-        foreach (var instance in derivedInstances)
-            AddLog(instance.ProcessName);
-    }
-
-    public static IEnumerable<T> CreateUiAccessibilityIdentityInstances<T>() where T : class
-    {
-        var derivedTypes = GetUiAccessibilityIdentityTypes(typeof(T));
-
-        var instances = new List<T>();
-
-        foreach (var type in derivedTypes)
-            if (Activator.CreateInstance(type) is T instance)
-                instances.Add(instance);
-
-        return instances;
-    }
-
-    public static IEnumerable<Type> GetUiAccessibilityIdentityTypes(Type baseType)
-    {
-        var derivedTypes = new List<Type>();
-
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-        foreach (var assembly in assemblies)
-            derivedTypes.AddRange(assembly.GetTypes().Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract));
-
-        return derivedTypes;
     }
 }

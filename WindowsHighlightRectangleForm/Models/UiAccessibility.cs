@@ -2,7 +2,7 @@
 
 namespace WindowsHighlightRectangleForm.Models;
 
-internal abstract class UiAccessibility
+public abstract class UiAccessibility
 {
     public Process Process { get; protected set; }
 
@@ -12,5 +12,7 @@ internal abstract class UiAccessibility
 
     public Version Version { get; protected set; }
 
-    public abstract DistinctStack<UiAccessibilityElement> Snapshotting(UiAccessibilityElement element);
+    public abstract DistinctStack<UiAccessibilityElement> Record(object element);
+
+    public abstract void Playback();
 }

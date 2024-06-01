@@ -10,11 +10,11 @@ namespace WindowsHighlightRectangleForm.Models;
 
 public class UiaAccessibilityIdentity : UiAccessibilityIdentity
 {
-    private static readonly Dictionary<string, IUiaAppAccessibilityIdentity> AppAccessibilityIdentities;
+    public static readonly Dictionary<string, IUiaAppAccessibilityIdentity> AppAccessibilityIdentities;
 
-    private readonly UIA3Automation _automation = new();
-    private readonly AutomationElement _rootElement;
-    private readonly ITreeWalker _treeWalker;
+    public readonly UIA3Automation Automation = new();
+    public readonly AutomationElement RootElement;
+    public readonly ITreeWalker TreeWalker;
 
     static UiaAccessibilityIdentity()
     {
@@ -25,24 +25,24 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
 
     public UiaAccessibilityIdentity()
     {
-        _treeWalker = _automation.TreeWalkerFactory.GetControlViewWalker();
-        _rootElement = _automation.GetDesktop();
+        TreeWalker = Automation.TreeWalkerFactory.GetControlViewWalker();
+        RootElement = Automation.GetDesktop();
         Priority = UiAccessibilityIdentityPriority.Highest;
     }
 
     public override UiAccessibilityElement? FromPoint(Point location)
     {
         var hoveredElement =
-            _automation.FromPoint(location);
+            Automation.FromPoint(location);
         if (hoveredElement == null) return null;
-        _treeWalker.GetParent(hoveredElement);
+        TreeWalker.GetParent(hoveredElement);
         var processName = Process.GetProcessById(hoveredElement.Properties.ProcessId).ProcessName;
         var findKey =
             AppAccessibilityIdentities.Keys.FirstOrDefault(c =>
                 c.Contains(processName, StringComparison.OrdinalIgnoreCase));
         if (!string.IsNullOrEmpty(findKey))
             hoveredElement = AppAccessibilityIdentities[findKey]
-                .FromHoveredElement(location, hoveredElement, _treeWalker);
+                .FromHoveredElement(location, hoveredElement, TreeWalker);
         return DtoAccessibilityElement(hoveredElement);
     }
 
