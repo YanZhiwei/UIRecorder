@@ -19,7 +19,7 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
     static UiaAccessibilityIdentity()
     {
         AppAccessibilityIdentities = ReflectHelper
-            .CreateInterfaceTypeInstances<IUiaAppAccessibilityIdentity>(Assembly.GetExecutingAssembly())
+            .CreateInterfaceTypeInstances<IUiaAppAccessibilityIdentity>()
             .ToDictionary(key => key.IdentityString, value => value);
     }
 
