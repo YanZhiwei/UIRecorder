@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.UIA3;
 using Tenon.Helper.Internal;
+using Application = FlaUI.Core.Application;
 
 namespace WindowsHighlightRectangleForm.Models;
 
@@ -59,6 +59,7 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
             IsEnabled = automationElement.Properties.IsEnabled.ValueOrDefault,
             IsOffscreen = automationElement.Properties.IsOffscreen.ValueOrDefault,
             IsDialog = automationElement.Properties.IsDialog.ValueOrDefault,
+            Element = automationElement,
             ControlType = automationElement.GetControlType() switch
             {
                 ControlType.Document => UiAccessibilityControlType.Document,

@@ -8,11 +8,11 @@ public sealed class WeChatUiaAccessibilityIdentity : IUiaAppAccessibilityIdentit
 {
     public WeChatUiaAccessibilityIdentity()
     {
-        SupportProcessNames = ["WeChat", "WeChatApp"];
-        IdentityString = string.Join(",", SupportProcessNames);
+        SupportedProcessNames = ["WeChat", "WeChatApp"];
+        IdentityString = string.Join(",", SupportedProcessNames);
     }
 
-    public string[] SupportProcessNames { get; }
+    public string[] SupportedProcessNames { get; }
     public string IdentityString { get; }
 
     public AutomationElement? FromHoveredElement(Point location, AutomationElement hoveredElement,

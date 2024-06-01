@@ -1,44 +1,53 @@
-﻿using FlaUI.Core.AutomationElements;
-using Tenon.Serialization.Abstractions;
+﻿using System.Diagnostics;
+using FlaUI.Core.AutomationElements;
 
 namespace WindowsHighlightRectangleForm.Models;
 
 public class UiaAccessibility : UiAccessibility
 {
     protected readonly UiaAccessibilityIdentity Identity;
-    protected readonly ISerializer Serializer;
 
-    public UiaAccessibility(ISerializer serializer, UiaAccessibilityIdentity uiaAccessibilityIdentity)
+    public UiaAccessibility(UiaAccessibilityIdentity uiaAccessibilityIdentity)
     {
-        Serializer = serializer;
         Identity = uiaAccessibilityIdentity ??
                    throw new ArgumentNullException(nameof(uiaAccessibilityIdentity));
-        Name = nameof(UiaAccessibility);
-        Type = "UIA";
+        Technology = UiAccessibilityTechnology.Uia;
+        Platform = PlatformID.Win32NT;
         Version = new Version(3, 0, 0);
     }
 
-    public override DistinctStack<UiAccessibilityElement> Record(object element)
+    public override void Record(object element)
     {
         if (element is not AutomationElement automationElement) throw new NotSupportedException(nameof(element));
         var uiaElementPaths = new DistinctStack<UiAccessibilityElement>();
         var currentElement = automationElement;
-        uiaElementPaths.Push(Identity.DtoAccessibilityElement(currentElement));
+        FileName = Process.GetProcessById(currentElement.Properties.ProcessId).ProcessName;
+        uiaElementPaths.Push(Identity.DtoAccessibilityElement(currentElement)!);
         while (currentElement.Parent != null)
         {
             if (currentElement.Parent.Equals(Identity.RootElement))
                 break;
             currentElement = Identity.TreeWalker.GetParent(currentElement);
-            var standardElement = Identity.DtoAccessibilityElement(currentElement);
-            uiaElementPaths.Push(standardElement);
+            uiaElementPaths.Push(Identity.DtoAccessibilityElement(currentElement)!);
         }
 
-        var json = Serializer.SerializeObject(uiaElementPaths);
-        return uiaElementPaths;
+        RecordElements = uiaElementPaths;
     }
 
-    public override void Playback()
+    public override void Playback(DistinctStack<UiAccessibilityElement> paths)
     {
-        
+        if (!(paths?.Any() ?? false)) throw new InvalidOperationException(nameof(paths));
+
+        //AutomationElement? currentElement = null;
+        //while (paths.TryPop(out var item))
+        //{
+        //    if (item.Element is not AutomationElement automationElement) break;
+        //    currentElement = Identity.TreeWalker.GetFirstChild(automationElement);
+        //    if (currentElement != null)
+        //    {
+        //        currentElement.FindFirst(automationElement);
+        //    }
+
+        //}
     }
 }

@@ -5,7 +5,7 @@ namespace WindowsHighlightRectangleForm.Models;
 
 public interface IUiaAppAccessibilityIdentity
 {
-    public string[] SupportProcessNames { get; }
+    public string[] SupportedProcessNames { get; }
 
     public string IdentityString { get; }
 

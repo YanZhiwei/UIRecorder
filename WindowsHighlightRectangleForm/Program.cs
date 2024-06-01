@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tenon.Mapper.AutoMapper.Extensions;
+using Tenon.Serialization.Json;
 using Tenon.Serialization.Json.Extensions;
 using WindowsHighlightRectangleForm.Models;
 
@@ -34,7 +35,9 @@ internal static class Program
     private static void ConfigureServices(ServiceCollection services)
     {
         services.AddAutoMapperSetup(typeof(AutoMapperProfile).Assembly);
-        services.AddSystemTextJsonSerializer();
+        var jsonSerializerOptions = SystemTextJsonSerializer.DefaultOptions;
+        jsonSerializerOptions.WriteIndented = true;
+        services.AddSystemTextJsonSerializer(jsonSerializerOptions);
         services.AddScoped<MainForm>();
         services.AddSingleton<UiAccessibilityIdentity, UiaAccessibilityIdentity>();
         services.AddSingleton<UiAccessibility, UiaAccessibility>();
