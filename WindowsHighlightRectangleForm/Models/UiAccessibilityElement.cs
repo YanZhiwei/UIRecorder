@@ -4,7 +4,6 @@ namespace WindowsHighlightRectangleForm.Models;
 
 public class UiAccessibilityElement
 {
-
     public string Name { get; set; }
 
     public UiAccessibilityControlType ControlType { get; set; }
@@ -23,8 +22,7 @@ public class UiAccessibilityElement
 
     public string Id { get; set; }
 
-    [JsonIgnore]
-    public object Element { get;  set; }
+    [JsonIgnore] public object Element { get; set; }
 
     public override int GetHashCode()
     {

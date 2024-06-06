@@ -13,7 +13,7 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
     public static readonly Dictionary<string, IUiaAppAccessibilityIdentity> AppAccessibilityIdentities;
 
     public readonly UIA3Automation Automation = new();
-    public readonly AutomationElement RootElement;
+    public readonly AutomationElement DesktopElement;
     public readonly ITreeWalker TreeWalker;
 
     static UiaAccessibilityIdentity()
@@ -26,7 +26,7 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
     public UiaAccessibilityIdentity()
     {
         TreeWalker = Automation.TreeWalkerFactory.GetControlViewWalker();
-        RootElement = Automation.GetDesktop();
+        DesktopElement = Automation.GetDesktop();
         Priority = UiAccessibilityIdentityPriority.Highest;
     }
 

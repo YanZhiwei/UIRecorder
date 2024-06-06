@@ -1,20 +1,21 @@
 ﻿using System.Diagnostics;
 using System.Text.Json.Serialization;
+using Application = FlaUI.Core.Application;
 
 namespace WindowsHighlightRectangleForm.Models;
 
 public abstract class UiAccessibility : IDisposable
 {
     public string FileName { get; protected set; }
+    public int ProcessId { get; protected set; }
     public UiAccessibilityTechnology Technology { get; protected set; }
-
     public PlatformID Platform { get; set; }
     public Version Version { get; protected set; }
 
     [JsonPropertyName("paths")] public DistinctStack<UiAccessibilityElement> RecordElements { get; protected set; }
 
     public abstract void Record(object element);
-    public abstract void Playback(DistinctStack<UiAccessibilityElement> paths);
+    public abstract void Replay();
 
     public virtual Process AttachOrLaunch(ProcessStartInfo? startInfo = null)
     {
@@ -25,6 +26,7 @@ public abstract class UiAccessibility : IDisposable
         {
             FileName = FileName
         };
+     
         return Process.Start(startInfo);
     }
 

@@ -106,7 +106,7 @@ public partial class MainForm : Form
 
     private void button5_Click(object sender, EventArgs e)
     {
-        var mainWindow = _uiaAccessibilityIdentity.RootElement.FindFirstChild(cf => cf.ByName("¼ÆËãÆ÷"));
+        var mainWindow = _uiaAccessibilityIdentity.DesktopElement.FindFirstChild(cf => cf.ByName("¼ÆËãÆ÷"));
         if (mainWindow != null)
         {
             var button1 = mainWindow.FindFirstDescendant(cf => cf.ByName("Ò»"))?.AsButton();
@@ -116,6 +116,7 @@ public partial class MainForm : Form
                 _uiAccessibility.Record(button1);
                 var jsonString = _serializer.SerializeObject(_uiAccessibility);
                 Debug.WriteLine(jsonString);
+                _uiAccessibility.Replay();
             }
         }
     }
