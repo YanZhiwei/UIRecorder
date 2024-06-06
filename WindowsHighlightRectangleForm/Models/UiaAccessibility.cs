@@ -1,14 +1,13 @@
 ﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Conditions;
 using FlaUI.UIA3.Identifiers;
+using Tenon.Windows.Extensions;
 
 namespace WindowsHighlightRectangleForm.Models;
 
 public class UiaAccessibility : UiAccessibility
 {
-    private const string FRAME_WINDOW = "ApplicationFrameWindow";
     protected readonly UiaAccessibilityIdentity Identity;
 
     public UiaAccessibility(UiaAccessibilityIdentity uiaAccessibilityIdentity)
@@ -22,45 +21,16 @@ public class UiaAccessibility : UiAccessibility
 
     protected IntPtr WindowHandle { get; set; }
 
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass,
-        string lpszWindow);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
     protected virtual AutomationElement GetWindowElement()
     {
         var process = Process.GetProcessById(ProcessId);
         var mainWindowHandle = process?.MainWindowHandle ?? WindowHandle;
         if (mainWindowHandle == IntPtr.Zero)
-        {
-            var windows = FindAppWindows(process);
-            mainWindowHandle = windows.FirstOrDefault();
-        }
+            mainWindowHandle = process.FindFirstCoreWindows();
 
         return mainWindowHandle == IntPtr.Zero
             ? Identity.DesktopElement
             : Identity.Automation.FromHandle(mainWindowHandle);
-    }
-
-    private List<IntPtr> FindAppWindows(Process proc)
-    {
-        var appWindows = new List<IntPtr>();
-        for (var appWindow = FindWindowEx(IntPtr.Zero, IntPtr.Zero, FRAME_WINDOW, null);
-             appWindow != IntPtr.Zero;
-             appWindow = FindWindowEx(IntPtr.Zero, appWindow, FRAME_WINDOW, null))
-        {
-            var coreWindow = FindWindowEx(appWindow, IntPtr.Zero, "Windows.UI.Core.CoreWindow", null);
-            if (coreWindow != IntPtr.Zero)
-            {
-                GetWindowThreadProcessId(coreWindow, out var corePid);
-                if (corePid == proc.Id) 
-                    appWindows.Add(appWindow);
-            }
-        }
-
-        return appWindows;
     }
 
     public override void Record(object element)
@@ -82,7 +52,7 @@ public class UiaAccessibility : UiAccessibility
         RecordElements = uiaElementPaths;
     }
 
-    public override void Replay()
+    public override UiAccessibilityElement? FindElement()
     {
         AutomationElement? foundElement = null;
         var parentElement = GetWindowElement();
@@ -90,18 +60,15 @@ public class UiaAccessibility : UiAccessibility
         {
             if (item.Element is not AutomationElement automationElement) break;
             if (parentElement == null) continue;
-            var condition = CreateConditionFromElement(automationElement);
+            var condition = CreateCondition(automationElement);
             foundElement = parentElement.FindFirstDescendant(condition);
             parentElement = foundElement ?? Identity.TreeWalker.GetNextSibling(parentElement);
         }
 
-        if (foundElement != null)
-            Console.WriteLine("Element found with the generated condition.");
-        else
-            Console.WriteLine("Element not found with the generated condition.");
+        return foundElement != null ? Identity.DtoAccessibilityElement(foundElement) : null;
     }
 
-    private static ConditionBase CreateConditionFromElement(AutomationElement element)
+    protected virtual ConditionBase CreateCondition(AutomationElement element)
     {
         var conditions = new List<ConditionBase>();
         if (element.Properties.AutomationId.IsSupported)
@@ -122,7 +89,6 @@ public class UiaAccessibility : UiAccessibility
             conditions.Add(new PropertyCondition(AutomationObjectIds.ControlTypeProperty, controlType));
         }
 
-        // 将所有条件合并为一个 AndCondition
         return new AndCondition(conditions.ToArray());
     }
 }

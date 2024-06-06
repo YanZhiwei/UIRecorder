@@ -15,7 +15,7 @@ public abstract class UiAccessibility : IDisposable
     [JsonPropertyName("paths")] public DistinctStack<UiAccessibilityElement> RecordElements { get; protected set; }
 
     public abstract void Record(object element);
-    public abstract void Replay();
+    public abstract UiAccessibilityElement? FindElement();
 
     public virtual Process AttachOrLaunch(ProcessStartInfo? startInfo = null)
     {

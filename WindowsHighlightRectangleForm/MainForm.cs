@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using FlaUI.Core.AutomationElements;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
@@ -115,8 +114,8 @@ public partial class MainForm : Form
                 button1?.Invoke();
                 _uiAccessibility.Record(button1);
                 var jsonString = _serializer.SerializeObject(_uiAccessibility);
-                Debug.WriteLine(jsonString);
-                _uiAccessibility.Replay();
+                var findElement = _uiAccessibility.FindElement();
+                AddLog(findElement != null ? "find Element" : "not find Element");
             }
         }
     }
