@@ -5,13 +5,18 @@ namespace WindowsHighlightRectangleForm.Models;
 
 public abstract class UiAccessibility : IDisposable
 {
-    public string FileName { get; protected set; }
-    public int ProcessId { get; protected set; }
-    public UiAccessibilityTechnology Technology { get; protected set; }
-    public PlatformID Platform { get; set; }
-    public Version Version { get; protected set; }
+    [JsonInclude] public string FileName { get; protected set; }
 
-    [JsonPropertyName("paths")] public DistinctStack<UiAccessibilityElement> RecordElements { get; protected set; }
+    [JsonInclude] public UiAccessibilityTechnology Technology { get; protected set; }
+
+
+    [JsonInclude] public PlatformID Platform { get; protected set; }
+
+    [JsonInclude] public Version Version { get; protected set; }
+
+    [JsonPropertyName("paths")]
+    [JsonInclude]
+    public DistinctStack<UiAccessibilityElement> RecordElements { get; protected set; }
 
     public void Dispose()
     {

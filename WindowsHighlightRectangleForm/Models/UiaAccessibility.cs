@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text.Json.Serialization;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Conditions;
 using FlaUI.Core.Definitions;
@@ -16,7 +15,8 @@ public class UiaAccessibility : UiAccessibility
     protected readonly IObjectMapper Mapper;
     protected readonly ISerializer Serializer;
 
-    public UiaAccessibility(UiaAccessibilityIdentity uiaAccessibilityIdentity, IObjectMapper mapper, ISerializer serializer)
+    public UiaAccessibility(UiaAccessibilityIdentity uiaAccessibilityIdentity, IObjectMapper mapper,
+        ISerializer serializer)
     {
         Identity = uiaAccessibilityIdentity ??
                    throw new ArgumentNullException(nameof(uiaAccessibilityIdentity));
@@ -29,7 +29,6 @@ public class UiaAccessibility : UiAccessibility
 
     public UiaAccessibility()
     {
-
     }
 
     protected IntPtr WindowHandle { get; set; }
@@ -72,9 +71,9 @@ public class UiaAccessibility : UiAccessibility
         var uiaAccessibility = Serializer.DeserializeObject<UiaAccessibility>(locatorPath);
         AutomationElement? foundElement = null;
         var parentElement = GetWindowElement(uiaAccessibility.FileName);
-        while (uiaAccessibility.RecordElements.TryPop(out var item))
+        var recordElements = new Stack<UiAccessibilityElement>(uiaAccessibility.RecordElements);
+        while (recordElements.TryPop(out var item))
         {
-            if (item.Element is not AutomationElement automationElement) break;
             if (parentElement == null) continue;
             var condition = CreateCondition(item);
             foundElement = parentElement.FindFirstDescendant(condition);
