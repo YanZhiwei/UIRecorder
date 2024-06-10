@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Conditions;
 using FlaUI.Core.Definitions;
 using FlaUI.UIA3.Identifiers;
 using Tenon.Mapper.Abstractions;
+using Tenon.Serialization.Abstractions;
 using Tenon.Windows.Extensions;
 
 namespace WindowsHighlightRectangleForm.Models;
@@ -12,22 +14,29 @@ public class UiaAccessibility : UiAccessibility
 {
     protected readonly UiaAccessibilityIdentity Identity;
     protected readonly IObjectMapper Mapper;
+    protected readonly ISerializer Serializer;
 
-    public UiaAccessibility(UiaAccessibilityIdentity uiaAccessibilityIdentity, IObjectMapper mapper)
+    public UiaAccessibility(UiaAccessibilityIdentity uiaAccessibilityIdentity, IObjectMapper mapper, ISerializer serializer)
     {
         Identity = uiaAccessibilityIdentity ??
                    throw new ArgumentNullException(nameof(uiaAccessibilityIdentity));
         Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        Serializer = serializer;
         Technology = UiAccessibilityTechnology.Uia;
         Platform = PlatformID.Win32NT;
         Version = new Version(3, 0, 0);
     }
 
+    public UiaAccessibility()
+    {
+
+    }
+
     protected IntPtr WindowHandle { get; set; }
 
-    protected virtual AutomationElement GetWindowElement()
+    protected virtual AutomationElement GetWindowElement(string processName)
     {
-        var process = Process.GetProcessById(ProcessId);
+        var process = Process.GetProcessesByName(processName).FirstOrDefault();
         var mainWindowHandle = process?.MainWindowHandle ?? WindowHandle;
         if (mainWindowHandle == IntPtr.Zero)
             mainWindowHandle = process.FindFirstCoreWindows();
@@ -40,7 +49,6 @@ public class UiaAccessibility : UiAccessibility
     public override void Record(object element)
     {
         if (element is not AutomationElement automationElement) throw new NotSupportedException(nameof(element));
-        ProcessId = automationElement.Properties.ProcessId;
         var uiaElementPaths = new DistinctStack<UiAccessibilityElement>();
         var currentElement = automationElement;
         FileName = Process.GetProcessById(currentElement.Properties.ProcessId).ProcessName;
@@ -56,11 +64,15 @@ public class UiaAccessibility : UiAccessibility
         RecordElements = uiaElementPaths;
     }
 
-    public override UiAccessibilityElement? FindElement()
+    public override UiAccessibilityElement? FindElement(string locatorPath)
     {
+        if (string.IsNullOrEmpty(locatorPath))
+            throw new ArgumentNullException(nameof(locatorPath));
+
+        var uiaAccessibility = Serializer.DeserializeObject<UiaAccessibility>(locatorPath);
         AutomationElement? foundElement = null;
-        var parentElement = GetWindowElement();
-        while (RecordElements.TryPop(out var item))
+        var parentElement = GetWindowElement(uiaAccessibility.FileName);
+        while (uiaAccessibility.RecordElements.TryPop(out var item))
         {
             if (item.Element is not AutomationElement automationElement) break;
             if (parentElement == null) continue;

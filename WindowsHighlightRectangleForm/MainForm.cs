@@ -1,3 +1,4 @@
+using System.Text;
 using FlaUI.Core.AutomationElements;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
@@ -114,7 +115,8 @@ public partial class MainForm : Form
                 button1?.Invoke();
                 _uiAccessibility.Record(button1);
                 var jsonString = _serializer.SerializeObject(_uiAccessibility);
-                var findElement = _uiAccessibility.FindElement();
+                File.WriteAllText("locator.path", jsonString, Encoding.UTF8);
+                var findElement = _uiAccessibility.FindElement(jsonString);
                 AddLog(findElement != null ? "find Element" : "not find Element");
             }
         }

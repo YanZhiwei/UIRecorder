@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text.Json.Serialization;
-using Application = FlaUI.Core.Application;
 
 namespace WindowsHighlightRectangleForm.Models;
 
@@ -14,8 +13,13 @@ public abstract class UiAccessibility : IDisposable
 
     [JsonPropertyName("paths")] public DistinctStack<UiAccessibilityElement> RecordElements { get; protected set; }
 
+    public void Dispose()
+    {
+        // TODO release managed resources here
+    }
+
     public abstract void Record(object element);
-    public abstract UiAccessibilityElement? FindElement();
+    public abstract UiAccessibilityElement? FindElement(string locatorPath);
 
     public virtual Process AttachOrLaunch(ProcessStartInfo? startInfo = null)
     {
@@ -26,7 +30,7 @@ public abstract class UiAccessibility : IDisposable
         {
             FileName = FileName
         };
-     
+
         return Process.Start(startInfo);
     }
 
@@ -40,11 +44,5 @@ public abstract class UiAccessibility : IDisposable
 
     public virtual void Close()
     {
-
-    }
-
-    public void Dispose()
-    {
-        // TODO release managed resources here
     }
 }
