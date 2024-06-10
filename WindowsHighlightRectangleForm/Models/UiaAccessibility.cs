@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Conditions;
+using FlaUI.Core.Definitions;
 using FlaUI.UIA3.Identifiers;
+using Tenon.Mapper.Abstractions;
 using Tenon.Windows.Extensions;
 
 namespace WindowsHighlightRectangleForm.Models;
@@ -9,11 +11,13 @@ namespace WindowsHighlightRectangleForm.Models;
 public class UiaAccessibility : UiAccessibility
 {
     protected readonly UiaAccessibilityIdentity Identity;
+    protected readonly IObjectMapper Mapper;
 
-    public UiaAccessibility(UiaAccessibilityIdentity uiaAccessibilityIdentity)
+    public UiaAccessibility(UiaAccessibilityIdentity uiaAccessibilityIdentity, IObjectMapper mapper)
     {
         Identity = uiaAccessibilityIdentity ??
                    throw new ArgumentNullException(nameof(uiaAccessibilityIdentity));
+        Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         Technology = UiAccessibilityTechnology.Uia;
         Platform = PlatformID.Win32NT;
         Version = new Version(3, 0, 0);
@@ -60,7 +64,7 @@ public class UiaAccessibility : UiAccessibility
         {
             if (item.Element is not AutomationElement automationElement) break;
             if (parentElement == null) continue;
-            var condition = CreateCondition(automationElement);
+            var condition = CreateCondition(item);
             foundElement = parentElement.FindFirstDescendant(condition);
             parentElement = foundElement ?? Identity.TreeWalker.GetNextSibling(parentElement);
         }
@@ -68,27 +72,18 @@ public class UiaAccessibility : UiAccessibility
         return foundElement != null ? Identity.DtoAccessibilityElement(foundElement) : null;
     }
 
-    protected virtual ConditionBase CreateCondition(AutomationElement element)
+    protected virtual ConditionBase CreateCondition(UiAccessibilityElement element)
     {
         var conditions = new List<ConditionBase>();
-        if (element.Properties.AutomationId.IsSupported)
-        {
-            var automationId = element.Properties.AutomationId.ValueOrDefault;
-            conditions.Add(new PropertyCondition(AutomationObjectIds.AutomationIdProperty, automationId));
-        }
-
-        if (element.Properties.Name.IsSupported)
-        {
-            var name = element.Properties.Name.ValueOrDefault;
-            conditions.Add(new PropertyCondition(AutomationObjectIds.NameProperty, name));
-        }
-
-        if (element.Properties.ControlType.IsSupported)
-        {
-            var controlType = element.Properties.ControlType.ValueOrDefault;
-            conditions.Add(new PropertyCondition(AutomationObjectIds.ControlTypeProperty, controlType));
-        }
-
+        if (!string.IsNullOrEmpty(element.Id))
+            conditions.Add(new PropertyCondition(AutomationObjectIds.AutomationIdProperty, element.Id));
+        if (!string.IsNullOrEmpty(element.Name))
+            conditions.Add(new PropertyCondition(AutomationObjectIds.NameProperty, element.Name));
+        conditions.Add(new PropertyCondition(AutomationObjectIds.IsDialogProperty, element.IsDialog));
+        if (!string.IsNullOrEmpty(element.Id))
+            conditions.Add(new PropertyCondition(AutomationObjectIds.AutomationIdProperty, element.Id));
+        conditions.Add(new PropertyCondition(AutomationObjectIds.ControlTypeProperty,
+            Mapper.Map<ControlType>(element.ControlType)));
         return new AndCondition(conditions.ToArray());
     }
 }

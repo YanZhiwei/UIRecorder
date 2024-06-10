@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
-using FlaUI.Core.Definitions;
 using FlaUI.UIA3;
 using Tenon.Helper.Internal;
-using Application = FlaUI.Core.Application;
+using Tenon.Mapper.Abstractions;
 
 namespace WindowsHighlightRectangleForm.Models;
 
@@ -14,6 +13,7 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
 
     public readonly UIA3Automation Automation = new();
     public readonly AutomationElement DesktopElement;
+    protected readonly IObjectMapper Mapper;
     public readonly ITreeWalker TreeWalker;
 
     static UiaAccessibilityIdentity()
@@ -23,8 +23,9 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
             .ToDictionary(key => key.IdentityString, value => value);
     }
 
-    public UiaAccessibilityIdentity()
+    public UiaAccessibilityIdentity(IObjectMapper mapper)
     {
+        Mapper = mapper;
         TreeWalker = Automation.TreeWalkerFactory.GetControlViewWalker();
         DesktopElement = Automation.GetDesktop();
         Priority = UiAccessibilityIdentityPriority.Highest;
@@ -60,50 +61,7 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
             IsOffscreen = automationElement.Properties.IsOffscreen.ValueOrDefault,
             IsDialog = automationElement.Properties.IsDialog.ValueOrDefault,
             Element = automationElement,
-            ControlType = automationElement.GetControlType() switch
-            {
-                ControlType.Document => UiAccessibilityControlType.Document,
-                ControlType.Calendar => UiAccessibilityControlType.Calendar,
-                ControlType.SplitButton => UiAccessibilityControlType.SplitButton,
-                ControlType.List => UiAccessibilityControlType.List,
-                ControlType.ListItem => UiAccessibilityControlType.ListItem,
-                ControlType.Thumb => UiAccessibilityControlType.Thumb,
-                ControlType.Custom => UiAccessibilityControlType.Custom,
-                ControlType.Tree => UiAccessibilityControlType.Tree,
-                ControlType.TreeItem => UiAccessibilityControlType.TreeItem,
-                ControlType.Button => UiAccessibilityControlType.Button,
-                ControlType.CheckBox => UiAccessibilityControlType.CheckBox,
-                ControlType.ComboBox => UiAccessibilityControlType.ComboBox,
-                ControlType.Edit => UiAccessibilityControlType.Edit,
-                ControlType.Group => UiAccessibilityControlType.Group,
-                ControlType.Image => UiAccessibilityControlType.Image,
-                ControlType.Menu => UiAccessibilityControlType.Menu,
-                ControlType.MenuBar => UiAccessibilityControlType.MenuBar,
-                ControlType.MenuItem => UiAccessibilityControlType.MenuItem,
-                ControlType.ProgressBar => UiAccessibilityControlType.ProgressBar,
-                ControlType.RadioButton => UiAccessibilityControlType.RadioButton,
-                ControlType.ScrollBar => UiAccessibilityControlType.ScrollBar,
-                ControlType.Slider => UiAccessibilityControlType.Slider,
-                ControlType.Spinner => UiAccessibilityControlType.Spinner,
-                ControlType.StatusBar => UiAccessibilityControlType.StatusBar,
-                ControlType.Tab => UiAccessibilityControlType.Tab,
-                ControlType.TabItem => UiAccessibilityControlType.TabItem,
-                ControlType.Table => UiAccessibilityControlType.Table,
-                ControlType.Text => UiAccessibilityControlType.Text,
-                ControlType.ToolBar => UiAccessibilityControlType.ToolBar,
-                ControlType.ToolTip => UiAccessibilityControlType.ToolTip,
-                ControlType.Window => UiAccessibilityControlType.Window,
-                ControlType.Separator => UiAccessibilityControlType.Separator,
-                ControlType.SemanticZoom => UiAccessibilityControlType.SemanticZoom,
-                ControlType.AppBar => UiAccessibilityControlType.AppBar,
-                ControlType.TitleBar => UiAccessibilityControlType.TitleBar,
-                ControlType.Header => UiAccessibilityControlType.Header,
-                ControlType.HeaderItem => UiAccessibilityControlType.HeaderItem,
-                ControlType.Hyperlink => UiAccessibilityControlType.Hyperlink,
-                ControlType.DataGrid => UiAccessibilityControlType.DataGrid,
-                ControlType.DataItem => UiAccessibilityControlType.DataItem,
-                _ => UiAccessibilityControlType.Unknown
-            }
+            ControlType = Mapper.Map<UiAccessibilityControlType>(automationElement.ControlType)
         };
     }
 }
