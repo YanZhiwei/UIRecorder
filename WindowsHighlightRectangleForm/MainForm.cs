@@ -118,6 +118,8 @@ public partial class MainForm : Form
                 File.WriteAllText("locator.path", jsonString, Encoding.UTF8);
                 var findElement = _uiAccessibility.FindElement(jsonString);
                 AddLog(findElement != null ? "find Element" : "not find Element");
+                if (findElement is UiaAccessibilityElement uiaElement) 
+                    uiaElement.Click();
             }
         }
     }

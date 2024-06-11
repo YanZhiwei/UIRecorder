@@ -9,7 +9,6 @@ public abstract class UiAccessibility : IDisposable
 
     [JsonInclude] public UiAccessibilityTechnology Technology { get; protected set; }
 
-
     [JsonInclude] public PlatformID Platform { get; protected set; }
 
     [JsonInclude] public Version Version { get; protected set; }
@@ -25,7 +24,6 @@ public abstract class UiAccessibility : IDisposable
 
     public abstract void Record(object element);
     public abstract UiAccessibilityElement? FindElement(string locatorPath);
-
     public virtual Process AttachOrLaunch(ProcessStartInfo? startInfo = null)
     {
         var process = Process.GetProcessesByName(FileName);

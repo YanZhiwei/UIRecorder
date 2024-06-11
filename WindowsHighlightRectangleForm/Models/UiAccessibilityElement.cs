@@ -22,7 +22,7 @@ public class UiAccessibilityElement
 
     public string Id { get; set; }
 
-    [JsonIgnore] public object Element { get; set; }
+    [JsonIgnore] public object NativeElement { get; set; }
 
     public override int GetHashCode()
     {

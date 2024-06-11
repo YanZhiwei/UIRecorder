@@ -50,7 +50,7 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
     public override UiAccessibilityElement? DtoAccessibilityElement(object element)
     {
         if (element is not AutomationElement automationElement) return null;
-        return new UiAccessibilityElement
+        return new UiaAccessibilityElement
         {
             Name = automationElement.Properties.Name.ValueOrDefault,
             ActualWidth = automationElement.ActualWidth,
@@ -60,7 +60,7 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
             IsEnabled = automationElement.Properties.IsEnabled.ValueOrDefault,
             IsOffscreen = automationElement.Properties.IsOffscreen.ValueOrDefault,
             IsDialog = automationElement.Properties.IsDialog.ValueOrDefault,
-            Element = automationElement,
+            NativeElement = automationElement,
             ControlType = Mapper.Map<UiAccessibilityControlType>(automationElement.ControlType)
         };
     }

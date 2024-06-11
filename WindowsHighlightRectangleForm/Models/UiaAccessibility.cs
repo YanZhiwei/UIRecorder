@@ -74,10 +74,15 @@ public class UiaAccessibility : UiAccessibility
         var recordElements = new Stack<UiAccessibilityElement>(uiaAccessibility.RecordElements);
         while (recordElements.TryPop(out var item))
         {
-            if (parentElement == null) continue;
             var condition = CreateCondition(item);
             foundElement = parentElement.FindFirstDescendant(condition);
-            parentElement = foundElement ?? Identity.TreeWalker.GetNextSibling(parentElement);
+            if (foundElement == null)
+            {
+                parentElement = Identity.TreeWalker.GetParent(parentElement);
+                foundElement = parentElement.FindFirstChild(condition);
+            }
+            if (foundElement == null) break;
+            parentElement = foundElement;
         }
 
         return foundElement != null ? Identity.DtoAccessibilityElement(foundElement) : null;
@@ -91,8 +96,6 @@ public class UiaAccessibility : UiAccessibility
         if (!string.IsNullOrEmpty(element.Name))
             conditions.Add(new PropertyCondition(AutomationObjectIds.NameProperty, element.Name));
         conditions.Add(new PropertyCondition(AutomationObjectIds.IsDialogProperty, element.IsDialog));
-        if (!string.IsNullOrEmpty(element.Id))
-            conditions.Add(new PropertyCondition(AutomationObjectIds.AutomationIdProperty, element.Id));
         conditions.Add(new PropertyCondition(AutomationObjectIds.ControlTypeProperty,
             Mapper.Map<ControlType>(element.ControlType)));
         return new AndCondition(conditions.ToArray());
