@@ -81,6 +81,7 @@ public class UiaAccessibility : UiAccessibility
                 parentElement = Identity.TreeWalker.GetParent(parentElement);
                 foundElement = parentElement.FindFirstChild(condition);
             }
+
             if (foundElement == null) break;
             parentElement = foundElement;
         }
@@ -90,7 +91,7 @@ public class UiaAccessibility : UiAccessibility
 
     protected virtual ConditionBase CreateCondition(UiAccessibilityElement element)
     {
-        var conditions = new List<ConditionBase>
+        var conditions = new ConditionBase[]
         {
             !string.IsNullOrEmpty(element.Id)
                 ? new PropertyCondition(AutomationObjectIds.AutomationIdProperty, element.Id)
@@ -102,6 +103,6 @@ public class UiaAccessibility : UiAccessibility
             new PropertyCondition(AutomationObjectIds.ControlTypeProperty,
                 Mapper.Map<ControlType>(element.ControlType))
         };
-        return new AndCondition(conditions.ToArray());
+        return new AndCondition(conditions);
     }
 }
