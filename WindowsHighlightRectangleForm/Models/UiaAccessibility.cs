@@ -90,14 +90,18 @@ public class UiaAccessibility : UiAccessibility
 
     protected virtual ConditionBase CreateCondition(UiAccessibilityElement element)
     {
-        var conditions = new List<ConditionBase>();
-        if (!string.IsNullOrEmpty(element.Id))
-            conditions.Add(new PropertyCondition(AutomationObjectIds.AutomationIdProperty, element.Id));
-        if (!string.IsNullOrEmpty(element.Name))
-            conditions.Add(new PropertyCondition(AutomationObjectIds.NameProperty, element.Name));
-        conditions.Add(new PropertyCondition(AutomationObjectIds.IsDialogProperty, element.IsDialog));
-        conditions.Add(new PropertyCondition(AutomationObjectIds.ControlTypeProperty,
-            Mapper.Map<ControlType>(element.ControlType)));
+        var conditions = new List<ConditionBase>
+        {
+            !string.IsNullOrEmpty(element.Id)
+                ? new PropertyCondition(AutomationObjectIds.AutomationIdProperty, element.Id)
+                : new PropertyCondition(AutomationObjectIds.AutomationIdProperty, ""),
+            !string.IsNullOrEmpty(element.Name)
+                ? new PropertyCondition(AutomationObjectIds.NameProperty, element.Name)
+                : new PropertyCondition(AutomationObjectIds.NameProperty, ""),
+            new PropertyCondition(AutomationObjectIds.IsDialogProperty, element.IsDialog),
+            new PropertyCondition(AutomationObjectIds.ControlTypeProperty,
+                Mapper.Map<ControlType>(element.ControlType))
+        };
         return new AndCondition(conditions.ToArray());
     }
 }
