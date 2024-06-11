@@ -6,6 +6,7 @@ using Tenon.Mapper.Abstractions;
 using Tenon.Serialization.Abstractions;
 using WindowsHighlightRectangleForm.Models;
 using Process = System.Diagnostics.Process;
+using Window = Tenon.Infra.Windows.Win32.Window;
 
 namespace WindowsHighlightRectangleForm;
 
@@ -38,6 +39,11 @@ public partial class MainForm : Form
     {
         return await Task.Factory.StartNew(() =>
         {
+            var hwNd = Window.Get(location);
+            if (hwNd == IntPtr.Zero) return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
+            var higherProcessName = Process.GetProcessById((int)Window.GetProcessId(hwNd)).ProcessName;
+            if (_ignoreProcessNames.Contains(higherProcessName, StringComparer.OrdinalIgnoreCase))
+                return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
             var hoveredElement = _uiAccessibilityIdentity.FromPoint(location);
             if (hoveredElement == null)
                 return new Tuple<Rectangle, string>(Rectangle.Empty, string.Empty);
@@ -118,7 +124,7 @@ public partial class MainForm : Form
                 File.WriteAllText("locator.path", jsonString, Encoding.UTF8);
                 var findElement = _uiAccessibility.FindElement(jsonString);
                 AddLog(findElement != null ? "find Element" : "not find Element");
-                if (findElement is UiaAccessibilityElement uiaElement) 
+                if (findElement is UiaAccessibilityElement uiaElement)
                     uiaElement.Click();
             }
         }
