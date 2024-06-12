@@ -20,6 +20,7 @@ public partial class MainForm : Form
     private readonly UiAccessibilityIdentity _uiAccessibilityIdentity;
     private readonly WindowsHighlightRectangle _windowsHighlight;
     private readonly WindowsHighlightBehavior _windowsHighlightBehavior;
+    private bool _captureElement;
 
     public MainForm(UiAccessibility uiAccessibility, UiAccessibilityIdentity uiAccessibilityIdentity,
         ISerializer serializer, IObjectMapper mapper, UiaAccessibilityIdentity uiaAccessibilityIdentity)
@@ -65,12 +66,20 @@ public partial class MainForm : Form
     {
         _windowsHighlightBehavior.MouseMoveEventHandler += IdentifyFromPoint;
         _windowsHighlightBehavior.KeyDownEventHandler += KeyDownEventHandler;
+        _windowsHighlightBehavior.KeyUpEventHandler += KeyUpEventHandler;
         _windowsHighlightBehavior.Start();
+    }
+
+    private void KeyUpEventHandler(object? sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.LControlKey)
+            _captureElement = false;
     }
 
     private void KeyDownEventHandler(object? sender, KeyEventArgs e)
     {
-        if (e.KeyCode == Keys.LControlKey) AddLog("get locator");
+        if (e.KeyCode == Keys.LControlKey)
+            _captureElement = true;
     }
 
     private void IdentifyFromPoint(object? sender, MouseEventArgs e)
