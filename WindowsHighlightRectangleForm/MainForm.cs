@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Text;
 using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Exceptions;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
 using Tenon.Infra.Windows.Win32.Hooks;
@@ -28,9 +29,11 @@ public partial class MainForm : Form
 
     public MainForm(UiAccessibility uiAccessibility, ISerializer serializer)
     {
-        _uiAccessibility = uiAccessibility;
+        _uiAccessibility = uiAccessibility ?? throw new ArgumentNullException(nameof(uiAccessibility));
         if (uiAccessibility is UiaAccessibility uiaAccessibility)
             _uiaAccessibility = uiaAccessibility;
+        else
+            throw new NotSupportedByFrameworkException(nameof(uiaAccessibility));
 
         _serializer = serializer;
         InitializeComponent();
@@ -123,66 +126,51 @@ public partial class MainForm : Form
             try
             {
                 Mre.WaitOne(); //等待信号
-                UiAccessibilityElement? element = null;
+                UiAccessibilityElement? element;
                 if (MouseDownQueue.TryPop(out var ee))
                 {
+                    MouseMoveQueue.Clear();
                     MouseDownQueue.Clear();
-                    if (ee?.Location == null || ee.Location.IsEmpty) continue;
+                    if (ee.Location.IsEmpty)
+                    {
+                        _windowsHighlight.Hide();
+                        continue;
+                    }
                     if (_isLeftControl)
                     {
                         element = ElementFromPointAsync(ee.Location).ConfigureAwait(false).GetAwaiter().GetResult();
-                        if (element != null)
+                        if (element is { BoundingRectangle.IsEmpty: false })
                         {
-                            MouseMoveQueue.Clear();
+                            _windowsHighlight.SetLocation(element.BoundingRectangle, element.ControlType.ToString());
                             _uiAccessibility.Record(element.NativeElement);
                             var jsonString = _serializer.SerializeObject(_uiAccessibility);
                             AddLog($"capture element:{jsonString}");
                         }
+                        else
+                        {
+                            _windowsHighlight.Hide();
+                        }
                     }
                 }
 
-                if (element == null)
+                if (MouseMoveQueue.TryPop(out var e))
                 {
-                    if (MouseMoveQueue.TryPop(out var e))
+                    MouseMoveQueue.Clear();
+                    if (e.Location.IsEmpty) continue;
+                    element = ElementFromPointAsync(e.Location).ConfigureAwait(false).GetAwaiter().GetResult();
+                    if (element == null || element.BoundingRectangle.IsEmpty)
                     {
-                        MouseMoveQueue.Clear();
-                        if (e?.Location == null || e.Location.IsEmpty) continue;
-                        element = ElementFromPointAsync(e.Location).ConfigureAwait(false).GetAwaiter().GetResult();
+                        _windowsHighlight.Hide();
+                        continue;
                     }
-                }
 
-                if (element == null || element.BoundingRectangle.IsEmpty)
-                {
-                    _windowsHighlight.Hide();
-                    continue;
+                    _windowsHighlight.SetLocation(element.BoundingRectangle, element.ControlType.ToString());
                 }
-
-                _windowsHighlight.SetLocation(element.BoundingRectangle, element.ControlType.ToString());
             }
             catch
             {
                 // ignored
             }
-        }
-    }
-
-    private void IdentifyElement(MouseEventArgs e)
-    {
-        try
-        {
-            var identifyElement = ElementFromPointAsync(e.Location).ConfigureAwait(false).GetAwaiter().GetResult();
-            //AddLog($"identifyElement:{e.Location},controlType:{identifyElement?.ControlType}");
-            if (identifyElement == null || identifyElement.BoundingRectangle.IsEmpty)
-            {
-                _windowsHighlight.Hide();
-                return;
-            }
-
-            _windowsHighlight.SetLocation(identifyElement.BoundingRectangle, identifyElement.ControlType.ToString());
-        }
-        catch (Exception ex)
-        {
-            AddLog($"identifyElement failed,error:{ex.Message}");
         }
     }
 
@@ -225,11 +213,11 @@ public partial class MainForm : Form
         var mainWindow = _uiaAccessibility.Identity.DesktopElement.FindFirstChild(cf => cf.ByName("计算器"));
         if (mainWindow != null)
         {
-            var button1 = mainWindow.FindFirstDescendant(cf => cf.ByName("一"))?.AsButton();
-            if (button1 != null)
+            var buttonTest = mainWindow.FindFirstDescendant(cf => cf.ByName("一"))?.AsButton();
+            if (buttonTest != null)
             {
-                button1?.Invoke();
-                _uiAccessibility.Record(button1);
+                buttonTest?.Invoke();
+                _uiAccessibility.Record(buttonTest);
                 var jsonString = _serializer.SerializeObject(_uiAccessibility);
                 File.WriteAllText("locator.path", jsonString, Encoding.UTF8);
                 var findElement = _uiAccessibility.FindElement(jsonString);
