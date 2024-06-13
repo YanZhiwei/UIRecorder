@@ -39,8 +39,7 @@ internal static class Program
         jsonSerializerOptions.WriteIndented = true;
         services.AddSystemTextJsonSerializer(jsonSerializerOptions);
         services.AddScoped<MainForm>();
-        services.AddSingleton<UiAccessibilityIdentity, UiaAccessibilityIdentity>();
         services.AddSingleton<UiAccessibility, UiaAccessibility>();
-        services.AddSingleton<UiaAccessibilityIdentity>();
+        services.AddSingleton<UiaAccessibility>();
     }
 }

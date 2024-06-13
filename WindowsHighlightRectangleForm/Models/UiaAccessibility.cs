@@ -11,15 +11,14 @@ namespace WindowsHighlightRectangleForm.Models;
 
 public class UiaAccessibility : UiAccessibility
 {
-    protected readonly UiaAccessibilityIdentity Identity;
+    public readonly UiaAccessibilityIdentity Identity;
     protected readonly IObjectMapper Mapper;
     protected readonly ISerializer Serializer;
 
-    public UiaAccessibility(UiaAccessibilityIdentity uiaAccessibilityIdentity, IObjectMapper mapper,
+    public UiaAccessibility(IObjectMapper mapper,
         ISerializer serializer)
     {
-        Identity = uiaAccessibilityIdentity ??
-                   throw new ArgumentNullException(nameof(uiaAccessibilityIdentity));
+        Identity = new UiaAccessibilityIdentity(mapper);
         Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         Serializer = serializer;
         Technology = UiAccessibilityTechnology.Uia;

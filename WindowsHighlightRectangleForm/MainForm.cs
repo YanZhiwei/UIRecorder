@@ -1,8 +1,9 @@
+using System.Collections.Concurrent;
 using System.Text;
 using FlaUI.Core.AutomationElements;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
-using Tenon.Mapper.Abstractions;
+using Tenon.Infra.Windows.Win32.Hooks;
 using Tenon.Serialization.Abstractions;
 using WindowsHighlightRectangleForm.Models;
 using Process = System.Diagnostics.Process;
@@ -12,27 +13,27 @@ namespace WindowsHighlightRectangleForm;
 
 public partial class MainForm : Form
 {
+    private static readonly object SyncRoot = new();
+    protected static readonly ManualResetEvent Mre = new(true);
     private readonly string[] _ignoreProcessNames;
-    private readonly IObjectMapper _mapper;
     private readonly ISerializer _serializer;
-    private readonly UiaAccessibilityIdentity _uiaAccessibilityIdentity;
+    private readonly UiaAccessibility _uiaAccessibility;
     private readonly UiAccessibility _uiAccessibility;
-    private readonly UiAccessibilityIdentity _uiAccessibilityIdentity;
     private readonly WindowsHighlightRectangle _windowsHighlight;
-    private readonly WindowsHighlightBehavior _windowsHighlightBehavior;
+    protected readonly ConcurrentStack<MouseEventArgs> MouseDownQueue = new();
+    protected readonly ConcurrentStack<MouseEventArgs> MouseMoveQueue = new();
     private bool _isLeftControl;
-    private bool _isMouseDown;
+    protected Thread? WorkerThread;
+    private bool _shutdown;
 
-    public MainForm(UiAccessibility uiAccessibility, UiAccessibilityIdentity uiAccessibilityIdentity,
-        ISerializer serializer, IObjectMapper mapper, UiaAccessibilityIdentity uiaAccessibilityIdentity)
+    public MainForm(UiAccessibility uiAccessibility, ISerializer serializer)
     {
         _uiAccessibility = uiAccessibility;
-        _uiAccessibilityIdentity = uiAccessibilityIdentity;
+        if (uiAccessibility is UiaAccessibility uiaAccessibility)
+            _uiaAccessibility = uiaAccessibility;
+
         _serializer = serializer;
-        _mapper = mapper;
-        _uiaAccessibilityIdentity = uiaAccessibilityIdentity;
         InitializeComponent();
-        _windowsHighlightBehavior = new WindowsHighlightBehavior();
         _windowsHighlight = new WindowsHighlightRectangle();
         _ignoreProcessNames = [Process.GetCurrentProcess().ProcessName];
     }
@@ -46,7 +47,7 @@ public partial class MainForm : Form
             var higherProcessName = Process.GetProcessById((int)Window.GetProcessId(hwNd)).ProcessName;
             if (_ignoreProcessNames.Contains(higherProcessName, StringComparer.OrdinalIgnoreCase))
                 return null;
-            var hoveredElement = _uiAccessibilityIdentity.FromPoint(location);
+            var hoveredElement = _uiaAccessibility.Identity.FromPoint(location);
             return hoveredElement;
         });
     }
@@ -60,39 +61,112 @@ public partial class MainForm : Form
 
     private void button1_Click(object sender, EventArgs e)
     {
-        _windowsHighlightBehavior.MouseMoveEventHandler += MouseMoveEventHandler;
-        _windowsHighlightBehavior.MouseDownEventHandler += MouseDownEventHandler;
-        _windowsHighlightBehavior.MouseUpEventHandler += MouseUpEventHandler;
-        _windowsHighlightBehavior.KeyDownEventHandler += KeyDownEventHandler;
-        _windowsHighlightBehavior.KeyUpEventHandler += KeyUpEventHandler;
-        _windowsHighlightBehavior.Start();
+        lock (SyncRoot)
+        {
+            _shutdown = true;
+            MouseHook.Install();
+            KeyboardHook.Install();
+            MouseHook.MouseMove += Hook_MouseMove;
+            MouseHook.LeftButtonDown += Hook_MouseDown;
+            MouseHook.RightButtonDown += Hook_MouseDown;
+            MouseHook.LeftButtonUp += Hook_UpDown;
+            MouseHook.RightButtonUp += Hook_UpDown;
+            KeyboardHook.KeyDown += Hook_KeyDown;
+            KeyboardHook.KeyUp += Hook_KeyUp;
+            if (WorkerThread == null)
+            {
+                WorkerThread = new Thread(ThreadProcedure)
+                {
+                    Priority = ThreadPriority.AboveNormal,
+                    IsBackground = true
+                };
+                WorkerThread.SetApartmentState(ApartmentState.STA);
+            }
+
+            WorkerThread.Start();
+            Mre.Set();
+        }
     }
 
-    private void MouseUpEventHandler(object? sender, MouseEventArgs e)
-    {
-        _isMouseDown = false;
-        AddLog($"isMouseDown:{_isMouseDown},isLeftControl:{_isLeftControl}");
-    }
-
-    private void MouseDownEventHandler(object? sender, MouseEventArgs e)
-    {
-        _isMouseDown = true;
-        AddLog($"isMouseDown:{_isMouseDown},isLeftControl:{_isLeftControl}");
-    }
-
-    private void KeyUpEventHandler(object? sender, KeyEventArgs e)
+    private void Hook_KeyUp(object? sender, KeyEventArgs e)
     {
         _isLeftControl = false;
-        AddLog($"isMouseDown:{_isMouseDown},isLeftControl:{_isLeftControl}");
     }
 
-    private void KeyDownEventHandler(object? sender, KeyEventArgs e)
+    private void Hook_KeyDown(object? sender, KeyEventArgs e)
     {
-        _isLeftControl = e.KeyCode == Keys.LControlKey;
-        AddLog($"isMouseDown:{_isMouseDown},isLeftControl:{_isLeftControl}");
+        _isLeftControl = true;
     }
 
-    private void MouseMoveEventHandler(object? sender, MouseEventArgs e)
+    private void Hook_UpDown(object? sender, MouseEventArgs e)
+    {
+        MouseDownQueue.Clear();
+    }
+
+    private void Hook_MouseDown(object? sender, MouseEventArgs e)
+    {
+        MouseDownQueue.Push(e);
+    }
+
+    private void Hook_MouseMove(object? sender, MouseEventArgs e)
+    {
+        MouseMoveQueue.Push(e);
+    }
+
+    private void ThreadProcedure(object? obj)
+    {
+        var currentPosition = Cursor.Position;
+        MouseMoveQueue.Push(
+            new MouseEventArgs(MouseButtons.None, 0, currentPosition.X, currentPosition.Y, 0));
+        while (_shutdown)
+        {
+            try
+            {
+                Mre.WaitOne(); //等待信号
+                UiAccessibilityElement? element = null;
+                if (MouseDownQueue.TryPop(out var ee))
+                {
+                    MouseDownQueue.Clear();
+                    if (ee?.Location == null || ee.Location.IsEmpty) continue;
+                    if (_isLeftControl)
+                    {
+                        element = ElementFromPointAsync(ee.Location).ConfigureAwait(false).GetAwaiter().GetResult();
+                        if (element != null)
+                        {
+                            MouseMoveQueue.Clear();
+                            _uiAccessibility.Record(element.NativeElement);
+                            var jsonString = _serializer.SerializeObject(_uiAccessibility);
+                            AddLog($"capture element:{jsonString}");
+                        }
+                    }
+                }
+
+                if (element == null)
+                {
+                    if (MouseMoveQueue.TryPop(out var e))
+                    {
+                        MouseMoveQueue.Clear();
+                        if (e?.Location == null || e.Location.IsEmpty) continue;
+                        element = ElementFromPointAsync(e.Location).ConfigureAwait(false).GetAwaiter().GetResult();
+                    }
+                }
+
+                if (element == null || element.BoundingRectangle.IsEmpty)
+                {
+                    _windowsHighlight.Hide();
+                    continue;
+                }
+
+                _windowsHighlight.SetLocation(element.BoundingRectangle, element.ControlType.ToString());
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+    }
+
+    private void IdentifyElement(MouseEventArgs e)
     {
         try
         {
@@ -114,27 +188,41 @@ public partial class MainForm : Form
 
     private void button2_Click(object sender, EventArgs e)
     {
-        _windowsHighlightBehavior.MouseMoveEventHandler -= MouseMoveEventHandler;
-        _windowsHighlightBehavior.MouseDownEventHandler -= MouseDownEventHandler;
-        _windowsHighlightBehavior.MouseUpEventHandler -= MouseUpEventHandler;
-        _windowsHighlightBehavior.KeyDownEventHandler -= KeyDownEventHandler;
-        _windowsHighlightBehavior.KeyUpEventHandler -= KeyUpEventHandler;
-        _windowsHighlightBehavior.Stop();
+        lock (SyncRoot)
+        {
+            _shutdown = false;
+            _windowsHighlight.Hide();
+            WorkerThread?.Interrupt();
+            WorkerThread = null;
+            MouseMoveQueue.Clear();
+            MouseDownQueue.Clear();
+            MouseHook.MouseMove -= Hook_MouseMove;
+            MouseHook.LeftButtonDown -= Hook_MouseDown;
+            MouseHook.RightButtonDown -= Hook_MouseDown;
+            MouseHook.LeftButtonUp -= Hook_UpDown;
+            MouseHook.RightButtonUp -= Hook_UpDown;
+            KeyboardHook.KeyDown -= Hook_KeyDown;
+            KeyboardHook.KeyUp -= Hook_KeyUp;
+            MouseHook.Uninstall();
+            KeyboardHook.Uninstall();
+        }
     }
 
     private void button3_Click(object sender, EventArgs e)
     {
-        _windowsHighlightBehavior.Suspend();
+        if (WorkerThread != null)
+            Mre.Reset();
     }
 
     private void button4_Click(object sender, EventArgs e)
     {
-        _windowsHighlightBehavior.Resume();
+        if (WorkerThread != null)
+            Mre.Set();
     }
 
     private void button5_Click(object sender, EventArgs e)
     {
-        var mainWindow = _uiaAccessibilityIdentity.DesktopElement.FindFirstChild(cf => cf.ByName("计算器"));
+        var mainWindow = _uiaAccessibility.Identity.DesktopElement.FindFirstChild(cf => cf.ByName("计算器"));
         if (mainWindow != null)
         {
             var button1 = mainWindow.FindFirstDescendant(cf => cf.ByName("一"))?.AsButton();
