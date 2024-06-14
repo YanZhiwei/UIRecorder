@@ -1,4 +1,5 @@
 ﻿using FlaUI.Core.AutomationElements;
+using Tenon.Helper.Internal;
 
 namespace WindowsHighlightRectangleForm.Models;
 
@@ -8,9 +9,8 @@ public class UiaAccessibilityElement : UiAccessibilityElement, IUiAccessibilityE
 
     static UiaAccessibilityElement()
     {
-        var derivedTypes = GetDerivedTypes(typeof(UiaAccessibilityElement));
-        var instances = InstantiateDerivedTypes(derivedTypes);
-        UiaAccessibilityElements = instances.Where(c => c.Metadata != null)
+        UiaAccessibilityElements = ReflectHelper.CreateDerivedInstances<UiaAccessibilityElement>()
+            .Where(c => c.Metadata != null)
             .ToDictionary(key => key.Metadata.IdentityString, value => value);
     }
 
@@ -37,38 +37,6 @@ public class UiaAccessibilityElement : UiAccessibilityElement, IUiAccessibilityE
             UiaAccessibilityElements.Keys.FirstOrDefault(c =>
                 c.Contains(processName, StringComparison.OrdinalIgnoreCase));
         return string.IsNullOrWhiteSpace(findKey) ? null : UiaAccessibilityElements[findKey];
-    }
-
-    private static List<UiaAccessibilityElement> InstantiateDerivedTypes(IEnumerable<Type> types)
-    {
-        var instances = new List<UiaAccessibilityElement>();
-
-        foreach (var type in types)
-            try
-            {
-                var instance = (UiaAccessibilityElement)Activator.CreateInstance(type);
-                instances.Add(instance);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"无法实例化类型 {type.FullName}: {ex.Message}");
-            }
-
-        return instances;
-    }
-
-    private static IEnumerable<Type> GetDerivedTypes(Type baseType)
-    {
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-        var derivedTypes = new List<Type>();
-
-        foreach (var assembly in assemblies)
-        {
-            var types = assembly.GetTypes().Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract);
-            derivedTypes.AddRange(types);
-        }
-
-        return derivedTypes;
     }
 
     protected void CheckNativeElement(out AutomationElement automationElement)
