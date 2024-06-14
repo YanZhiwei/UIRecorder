@@ -2,9 +2,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Tenon.Mapper.AutoMapper.Extensions;
 using Tenon.Serialization.Json;
 using Tenon.Serialization.Json.Extensions;
+using WindowsHighlightRectangleForm;
 using WindowsHighlightRectangleForm.Models;
 
-namespace WindowsHighlightRectangleForm;
+namespace WindowsHighlightSample;
 
 internal static class Program
 {

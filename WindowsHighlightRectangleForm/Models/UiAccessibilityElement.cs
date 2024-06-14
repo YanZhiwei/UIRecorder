@@ -18,6 +18,9 @@ public class UiAccessibilityElement
 
     [JsonIgnore] public double ActualWidth { get; set; }
 
+    [JsonIgnore]
+    public UiAccessibility Accessibility { get; set; }
+
     public bool IsDialog { get; set; }
 
     public string Id { get; set; }

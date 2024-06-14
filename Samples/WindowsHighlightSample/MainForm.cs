@@ -10,7 +10,7 @@ using WindowsHighlightRectangleForm.Models;
 using Process = System.Diagnostics.Process;
 using Window = Tenon.Infra.Windows.Win32.Window;
 
-namespace WindowsHighlightRectangleForm;
+namespace WindowsHighlightSample;
 
 public partial class MainForm : Form
 {

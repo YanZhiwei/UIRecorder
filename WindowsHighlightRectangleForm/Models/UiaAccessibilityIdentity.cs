@@ -9,7 +9,7 @@ namespace WindowsHighlightRectangleForm.Models;
 
 public class UiaAccessibilityIdentity : UiAccessibilityIdentity
 {
-    public static readonly Dictionary<string, IUiaAppAccessibilityIdentity> AppAccessibilityIdentities;
+    public static readonly Dictionary<string, IUiaAccessibilityIdentity> UiaAccessibilities;
 
     public readonly UIA3Automation Automation = new();
     public readonly AutomationElement DesktopElement;
@@ -18,9 +18,9 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
 
     static UiaAccessibilityIdentity()
     {
-        AppAccessibilityIdentities = ReflectHelper
-            .CreateInterfaceTypeInstances<IUiaAppAccessibilityIdentity>()
-            .ToDictionary(key => key.IdentityString, value => value);
+        UiaAccessibilities = ReflectHelper
+            .CreateInterfaceTypeInstances<IUiaAccessibilityIdentity>()
+            .ToDictionary(key => key.Metadata.IdentityString, value => value);
     }
 
     public UiaAccessibilityIdentity(IObjectMapper mapper)
@@ -39,15 +39,15 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
         TreeWalker.GetParent(hoveredElement);
         var processName = Process.GetProcessById(hoveredElement.Properties.ProcessId).ProcessName;
         var findKey =
-            AppAccessibilityIdentities.Keys.FirstOrDefault(c =>
+            UiaAccessibilities.Keys.FirstOrDefault(c =>
                 c.Contains(processName, StringComparison.OrdinalIgnoreCase));
         if (!string.IsNullOrEmpty(findKey))
-            hoveredElement = AppAccessibilityIdentities[findKey]
+            hoveredElement = UiaAccessibilities[findKey]
                 .FromHoveredElement(location, hoveredElement, TreeWalker);
-        return DtoAccessibilityElement(hoveredElement);
+        return DtoAccessibilityElement(hoveredElement, null);
     }
 
-    public override UiAccessibilityElement? DtoAccessibilityElement(object element)
+    public override UiAccessibilityElement? DtoAccessibilityElement(object element, UiAccessibility accessibility)
     {
         if (element is not AutomationElement automationElement) return null;
         return new UiaAccessibilityElement
@@ -61,7 +61,8 @@ public class UiaAccessibilityIdentity : UiAccessibilityIdentity
             IsOffscreen = automationElement.Properties.IsOffscreen.ValueOrDefault,
             IsDialog = automationElement.Properties.IsDialog.ValueOrDefault,
             NativeElement = automationElement,
-            ControlType = Mapper.Map<UiAccessibilityControlType>(automationElement.ControlType)
+            ControlType = Mapper.Map<UiAccessibilityControlType>(automationElement.ControlType),
+            Accessibility = accessibility
         };
     }
 }

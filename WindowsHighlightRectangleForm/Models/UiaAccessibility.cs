@@ -50,13 +50,13 @@ public class UiaAccessibility : UiAccessibility
         var uiaElementPaths = new DistinctStack<UiAccessibilityElement>();
         var currentElement = automationElement;
         FileName = Process.GetProcessById(currentElement.Properties.ProcessId).ProcessName;
-        uiaElementPaths.Push(Identity.DtoAccessibilityElement(currentElement)!);
+        uiaElementPaths.Push(Identity.DtoAccessibilityElement(currentElement, this)!);
         while (currentElement.Parent != null)
         {
             if (currentElement.Parent.Equals(Identity.DesktopElement))
                 break;
             currentElement = Identity.TreeWalker.GetParent(currentElement);
-            uiaElementPaths.Push(Identity.DtoAccessibilityElement(currentElement)!);
+            uiaElementPaths.Push(Identity.DtoAccessibilityElement(currentElement, this)!);
         }
 
         RecordElements = uiaElementPaths;
@@ -85,7 +85,7 @@ public class UiaAccessibility : UiAccessibility
             parentElement = foundElement;
         }
 
-        return foundElement != null ? Identity.DtoAccessibilityElement(foundElement) : null;
+        return foundElement != null ? Identity.DtoAccessibilityElement(foundElement, this) : null;
     }
 
     protected virtual ConditionBase CreateCondition(UiAccessibilityElement element)

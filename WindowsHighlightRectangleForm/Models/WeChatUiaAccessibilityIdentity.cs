@@ -4,16 +4,14 @@ using FlaUI.Core.Definitions;
 
 namespace WindowsHighlightRectangleForm.Models;
 
-public sealed class WeChatUiaAccessibilityIdentity : IUiaAppAccessibilityIdentity
+public sealed class WeChatUiaAccessibilityIdentity : IUiaAccessibilityIdentity
 {
     public WeChatUiaAccessibilityIdentity()
     {
-        SupportedProcessNames = ["WeChat", "WeChatApp"];
-        IdentityString = string.Join(",", SupportedProcessNames);
+        Metadata = new WeChatAccessibilityMetadata();
     }
 
-    public string[] SupportedProcessNames { get; }
-    public string IdentityString { get; }
+    public IAccessibilityMetadata Metadata { get; }
 
     public AutomationElement? FromHoveredElement(Point location, AutomationElement hoveredElement,
         ITreeWalker treeWalker)

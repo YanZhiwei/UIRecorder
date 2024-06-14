@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
@@ -9,7 +8,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recorder.Desktop", "Recorde
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsHighlightRectangleForm", "WindowsHighlightRectangleForm\WindowsHighlightRectangleForm.csproj", "{A9554CA6-84F0-46C3-B307-BD4EB9D758F1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{336DC2BB-FC78-4EB7-A6B2-5AEE448F47F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsHighlightSample", "Samples\WindowsHighlightSample\WindowsHighlightSample.csproj", "{E1BECF7F-257E-416E-92CC-52378DEEF985}"
+EndProject
 Global
+	GlobalSection(NestedProjects) = preSolution
+		{E1BECF7F-257E-416E-92CC-52378DEEF985} = {336DC2BB-FC78-4EB7-A6B2-5AEE448F47F5}
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -55,6 +61,18 @@ Global
 		{A9554CA6-84F0-46C3-B307-BD4EB9D758F1}.Release|x64.Build.0 = Release|x64
 		{A9554CA6-84F0-46C3-B307-BD4EB9D758F1}.Release|x86.ActiveCfg = Release|x86
 		{A9554CA6-84F0-46C3-B307-BD4EB9D758F1}.Release|x86.Build.0 = Release|x86
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Debug|x64.Build.0 = Debug|Any CPU
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Debug|x86.Build.0 = Debug|Any CPU
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Release|x64.ActiveCfg = Release|Any CPU
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Release|x64.Build.0 = Release|Any CPU
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Release|x86.ActiveCfg = Release|Any CPU
+		{E1BECF7F-257E-416E-92CC-52378DEEF985}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
