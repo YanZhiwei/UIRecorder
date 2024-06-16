@@ -1,9 +1,5 @@
 using System.Collections.Concurrent;
-using System.Text;
-using FlaUI.Core.AutomationElements;
-using FlaUI.Core.Exceptions;
 using Mortise.Accessibility.Abstractions;
-using Mortise.UiaAccessibility;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
 using Tenon.Infra.Windows.Win32.Hooks;
