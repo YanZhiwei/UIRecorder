@@ -1,9 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using Tenon.Mapper.AutoMapper.Extensions;
-using Tenon.Serialization.Json;
-using Tenon.Serialization.Json.Extensions;
-using WindowsHighlightRectangleForm;
-using WindowsHighlightRectangleForm.Models;
+using Mortise.Accessibility.Abstractions;
+using Mortise.UiaAccessibility.Extensions;
+using Mortise.UiaAccessibility.WeChat.Configurations;
 
 namespace WindowsHighlightSample;
 
@@ -25,8 +23,8 @@ internal static class Program
         var services = new ServiceCollection();
 
         ConfigureServices(services);
-
-        using (var serviceProvider = services.BuildServiceProvider())
+        var serviceProvider = services.BuildServiceProvider();
+        using (serviceProvider)
         {
             var form1 = serviceProvider.GetRequiredService<MainForm>();
             Application.Run(form1);
@@ -35,12 +33,7 @@ internal static class Program
 
     private static void ConfigureServices(ServiceCollection services)
     {
-        services.AddAutoMapperSetup(typeof(AutoMapperProfile).Assembly);
-        var jsonSerializerOptions = SystemTextJsonSerializer.DefaultOptions;
-        jsonSerializerOptions.WriteIndented = true;
-        services.AddSystemTextJsonSerializer(jsonSerializerOptions);
         services.AddScoped<MainForm>();
-        services.AddSingleton<UiAccessibility, UiaAccessibility>();
-        services.AddSingleton<UiaAccessibility>();
+        services.AddUiaAccessible(option => { option.AddWeChatAccessible(); });
     }
 }
