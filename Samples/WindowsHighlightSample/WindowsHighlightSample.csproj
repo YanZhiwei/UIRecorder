@@ -10,17 +10,23 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="System.Drawing.Common" Version="8.0.5" />
+		<PackageReference Include="Mortise.Accessibility.Abstractions" Version="0.0.1-alpha-202406160701" />
+		<PackageReference Include="Mortise.UiaAccessibility" Version="0.0.1-alpha-202406160701" />
+		<PackageReference Include="Mortise.UiaAccessibility.WeChat" Version="0.0.1-alpha-202406160701" />
+		<PackageReference Include="System.Drawing.Common" Version="8.0.6" />
 		<PackageReference Include="Tenon.Automation.Windows" Version="0.0.1-alpha-202406141611" />
 		<PackageReference Include="Tenon.Helper" Version="0.0.1-alpha-202406141611" />
 		<PackageReference Include="Tenon.Infra.Windows.Form" Version="0.0.1-alpha-202406141611" />
 		<PackageReference Include="Tenon.Mapper.AutoMapper" Version="0.0.1-alpha-202406141611" />
 		<PackageReference Include="Tenon.Serialization.Json" Version="0.0.1-alpha-202406141611" />
 		<PackageReference Include="Tenon.Windows.Extensions" Version="0.0.1-alpha-202406141612" />
+		<PackageReference Include="FlaUI.UIA3" Version="4.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\WindowsHighlightRectangleForm\WindowsHighlightRectangleForm.csproj" />
+	  <Reference Include="Mortise.UiaAccessibility">
+	    <HintPath>..\..\..\Mortise\src\UIA\Mortise.UIAAccessibility\bin\Debug\net8.0-windows\Mortise.UiaAccessibility.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 	<ItemGroup>
