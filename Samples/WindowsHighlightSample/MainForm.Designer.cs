@@ -36,8 +36,10 @@
             button2 = new Button();
             button1 = new Button();
             tabPage2 = new TabPage();
+            button6 = new Button();
             button5 = new Button();
             listBox1 = new ListBox();
+            button7 = new Button();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -51,7 +53,6 @@
             // 
             splitContainer1.Dock = DockStyle.Fill;
             splitContainer1.Location = new Point(0, 0);
-            splitContainer1.Margin = new Padding(4, 4, 4, 4);
             splitContainer1.Name = "splitContainer1";
             splitContainer1.Orientation = Orientation.Horizontal;
             // 
@@ -62,9 +63,8 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(listBox1);
-            splitContainer1.Size = new Size(1029, 529);
-            splitContainer1.SplitterDistance = 311;
-            splitContainer1.SplitterWidth = 5;
+            splitContainer1.Size = new Size(800, 450);
+            splitContainer1.SplitterDistance = 264;
             splitContainer1.TabIndex = 0;
             // 
             // tabControl1
@@ -73,10 +73,9 @@
             tabControl1.Controls.Add(tabPage2);
             tabControl1.Dock = DockStyle.Fill;
             tabControl1.Location = new Point(0, 0);
-            tabControl1.Margin = new Padding(4, 4, 4, 4);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1029, 311);
+            tabControl1.Size = new Size(800, 264);
             tabControl1.TabIndex = 0;
             // 
             // tabPage1
@@ -85,21 +84,19 @@
             tabPage1.Controls.Add(button3);
             tabPage1.Controls.Add(button2);
             tabPage1.Controls.Add(button1);
-            tabPage1.Location = new Point(4, 29);
-            tabPage1.Margin = new Padding(4, 4, 4, 4);
+            tabPage1.Location = new Point(4, 26);
             tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(4, 4, 4, 4);
-            tabPage1.Size = new Size(1021, 278);
+            tabPage1.Padding = new Padding(3);
+            tabPage1.Size = new Size(792, 234);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Hook";
             tabPage1.UseVisualStyleBackColor = true;
             // 
             // button4
             // 
-            button4.Location = new Point(406, 48);
-            button4.Margin = new Padding(4, 4, 4, 4);
+            button4.Location = new Point(316, 41);
             button4.Name = "button4";
-            button4.Size = new Size(96, 27);
+            button4.Size = new Size(75, 23);
             button4.TabIndex = 4;
             button4.Text = "Resume";
             button4.UseVisualStyleBackColor = true;
@@ -107,10 +104,9 @@
             // 
             // button3
             // 
-            button3.Location = new Point(276, 48);
-            button3.Margin = new Padding(4, 4, 4, 4);
+            button3.Location = new Point(215, 41);
             button3.Name = "button3";
-            button3.Size = new Size(96, 27);
+            button3.Size = new Size(75, 23);
             button3.TabIndex = 2;
             button3.Text = "Suspend";
             button3.UseVisualStyleBackColor = true;
@@ -118,10 +114,9 @@
             // 
             // button2
             // 
-            button2.Location = new Point(149, 48);
-            button2.Margin = new Padding(4, 4, 4, 4);
+            button2.Location = new Point(116, 41);
             button2.Name = "button2";
-            button2.Size = new Size(96, 27);
+            button2.Size = new Size(75, 23);
             button2.TabIndex = 1;
             button2.Text = "Stop";
             button2.UseVisualStyleBackColor = true;
@@ -129,10 +124,9 @@
             // 
             // button1
             // 
-            button1.Location = new Point(32, 48);
-            button1.Margin = new Padding(4, 4, 4, 4);
+            button1.Location = new Point(25, 41);
             button1.Name = "button1";
-            button1.Size = new Size(96, 27);
+            button1.Size = new Size(75, 23);
             button1.TabIndex = 0;
             button1.Text = "Start";
             button1.UseVisualStyleBackColor = true;
@@ -140,22 +134,34 @@
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(button7);
+            tabPage2.Controls.Add(button6);
             tabPage2.Controls.Add(button5);
-            tabPage2.Location = new Point(4, 29);
-            tabPage2.Margin = new Padding(4, 4, 4, 4);
+            tabPage2.Location = new Point(4, 26);
             tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(4, 4, 4, 4);
-            tabPage2.Size = new Size(1021, 278);
+            tabPage2.Padding = new Padding(3);
+            tabPage2.Size = new Size(792, 234);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Element";
             tabPage2.UseVisualStyleBackColor = true;
             // 
+            // button6
+            // 
+            button6.Location = new Point(269, 27);
+            button6.Margin = new Padding(2, 3, 2, 3);
+            button6.Name = "button6";
+            button6.Size = new Size(139, 25);
+            button6.TabIndex = 1;
+            button6.Text = "CurrentUICulture";
+            button6.UseVisualStyleBackColor = true;
+            button6.Click += button6_Click;
+            // 
             // button5
             // 
-            button5.Location = new Point(27, 32);
-            button5.Margin = new Padding(3, 4, 3, 4);
+            button5.Location = new Point(21, 27);
+            button5.Margin = new Padding(2, 3, 2, 3);
             button5.Name = "button5";
-            button5.Size = new Size(133, 29);
+            button5.Size = new Size(103, 25);
             button5.TabIndex = 0;
             button5.Text = "Record";
             button5.UseVisualStyleBackColor = true;
@@ -165,19 +171,29 @@
             // 
             listBox1.Dock = DockStyle.Fill;
             listBox1.FormattingEnabled = true;
+            listBox1.ItemHeight = 17;
             listBox1.Location = new Point(0, 0);
-            listBox1.Margin = new Padding(4, 4, 4, 4);
             listBox1.Name = "listBox1";
-            listBox1.Size = new Size(1029, 213);
+            listBox1.Size = new Size(800, 182);
             listBox1.TabIndex = 0;
+            // 
+            // button7
+            // 
+            button7.Location = new Point(145, 27);
+            button7.Margin = new Padding(2, 3, 2, 3);
+            button7.Name = "button7";
+            button7.Size = new Size(103, 25);
+            button7.TabIndex = 2;
+            button7.Text = "Save";
+            button7.UseVisualStyleBackColor = true;
+            button7.Click += button7_Click;
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(9F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1029, 529);
+            ClientSize = new Size(800, 450);
             Controls.Add(splitContainer1);
-            Margin = new Padding(4, 4, 4, 4);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "UI Recorder";
@@ -203,5 +219,7 @@
         private Button button3;
         private Button button4;
         private Button button5;
+        private Button button6;
+        private Button button7;
     }
 }
