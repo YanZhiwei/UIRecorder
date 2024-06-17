@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Mortise.Accessibility.Abstractions;
 using Mortise.UiaAccessibility.Extensions;
 using Mortise.UiaAccessibility.WeChat.Configurations;
 
@@ -26,6 +25,9 @@ internal static class Program
         var serviceProvider = services.BuildServiceProvider();
         using (serviceProvider)
         {
+            //var defaultCulture = new CultureInfo("en-US");
+            //CultureInfo.DefaultThreadCurrentUICulture = defaultCulture;
+            //CultureInfo.DefaultThreadCurrentCulture = defaultCulture;
             var form1 = serviceProvider.GetRequiredService<MainForm>();
             Application.Run(form1);
         }

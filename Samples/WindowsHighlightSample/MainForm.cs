@@ -1,5 +1,9 @@
 using System.Collections.Concurrent;
+using System.Globalization;
+using System.Text;
+using FlaUI.Core.AutomationElements;
 using Mortise.Accessibility.Abstractions;
+using Mortise.UiaAccessibility;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
 using Tenon.Infra.Windows.Win32.Hooks;
@@ -38,7 +42,7 @@ public partial class MainForm : Form
         {
             var hwNd = Window.Get(location);
             if (hwNd == IntPtr.Zero) return null;
-            var higherProcessName = Process.GetProcessById((int) Window.GetProcessId(hwNd)).ProcessName;
+            var higherProcessName = Process.GetProcessById((int)Window.GetProcessId(hwNd)).ProcessName;
             if (_ignoreProcessNames.Contains(higherProcessName, StringComparer.OrdinalIgnoreCase))
                 return null;
             var hoveredElement = _accessible.Identity.FromPoint(location);
@@ -130,7 +134,7 @@ public partial class MainForm : Form
                     if (_isLeftControl)
                     {
                         element = ElementFromPointAsync(ee.Location).ConfigureAwait(false).GetAwaiter().GetResult();
-                        if (element is {BoundingRectangle.IsEmpty: false})
+                        if (element is { BoundingRectangle.IsEmpty: false })
                         {
                             _windowsHighlight.SetLocation(element.BoundingRectangle, element.ControlType.ToString());
                             _accessible.Record(element.NativeElement);
@@ -200,21 +204,80 @@ public partial class MainForm : Form
 
     private void button5_Click(object sender, EventArgs e)
     {
-        //var mainWindow = _accessible.Identity.DesktopElement.FindFirstChild(cf => cf.ByName("计算器"));
-        //if (mainWindow != null)
-        //{
-        //    var buttonTest = mainWindow.FindFirstDescendant(cf => cf.ByName("一"))?.AsButton();
-        //    if (buttonTest != null)
-        //    {
-        //        buttonTest?.Invoke();
-        //        _uiaAccessibility.Record(buttonTest);
-        //        var jsonString = _serializer.SerializeObject(_uiaAccessibility);
-        //        File.WriteAllText("locator.path", jsonString, Encoding.UTF8);
-        //        var findElement = _uiaAccessibility.FindComponent(jsonString);
-        //        AddLog(findElement != null ? "find Element" : "not find Element");
-        //        //if (findElement is AccessibleComponent uiaElement)
-        //        //    uiaElement.Click();
-        //    }
-        //}
+        if (_accessible.Identity is not UiaAccessibleIdentity uiaAccessibleIdentity) return;
+        var mainWindow = uiaAccessibleIdentity.DesktopElement.FindFirstChild(cf => cf.ByName("计算器"));
+        if (mainWindow != null)
+        {
+            var buttonTest = mainWindow.FindFirstDescendant(cf => cf.ByName("一"))?.AsButton();
+            if (buttonTest != null)
+            {
+                buttonTest?.Invoke();
+                _accessible.Record(buttonTest);
+                var jsonString = _serializer.SerializeObject(_accessible);
+                File.WriteAllText("locator.path", jsonString, Encoding.UTF8);
+                var findElement = _accessible.FindComponent(jsonString);
+                AddLog(findElement != null ? "find Element" : "not find Element");
+                if (findElement is UiaAccessibleComponent component)
+                    component.Click();
+            }
+        }
+    }
+
+    private void button6_Click(object sender, EventArgs e)
+    {
+        var currentUICulture = CultureInfo.CurrentUICulture;
+        AddLog("当前UI语言信息:");
+        AddLog($"* 名称: {currentUICulture.Name}");
+        AddLog($"* 显示名称: {currentUICulture.DisplayName}");
+        AddLog($"* 英文名称: {currentUICulture.EnglishName}");
+        AddLog($"* 2字母ISO名称: {currentUICulture.TwoLetterISOLanguageName}");
+        AddLog($"* 3字母ISO名称: {currentUICulture.ThreeLetterISOLanguageName}");
+        AddLog($"* 3字母Win32 API名称: {currentUICulture.ThreeLetterWindowsLanguageName}");
+    }
+
+    private void button7_Click(object sender, EventArgs e)
+    {
+        var accessibleDict =
+            new ConcurrentDictionary<string, Accessible>(StringComparer.OrdinalIgnoreCase);
+        var locator1 = @"{
+    ""fileName"": ""CalculatorApp"",
+    ""provider"": ""Uia"",
+    ""platform"": ""Win32NT"",
+    ""version"": ""3.0.0"",
+    ""components"": [
+        {
+            ""name"": ""计算器"",
+            ""controlType"": ""Window"",
+            ""isDialog"": false,
+            ""id"": null
+        },
+        {
+            ""name"": null,
+            ""controlType"": ""Custom"",
+            ""isDialog"": false,
+            ""id"": ""NavView""
+        },
+        {
+            ""name"": null,
+            ""controlType"": ""Group"",
+            ""isDialog"": false,
+            ""id"": null
+        },
+        {
+            ""name"": ""数字键盘"",
+            ""controlType"": ""Group"",
+            ""isDialog"": false,
+            ""id"": ""NumberPad""
+        },
+        {
+            ""name"": ""一"",
+            ""controlType"": ""Button"",
+            ""isDialog"": false,
+            ""id"": ""num1Button""
+        }
+    ]
+}";
+        var accessible1 = _serializer.DeserializeObject<UiaAccessible>(locator1);
+        AddLog(accessible1.FileName);
     }
 }

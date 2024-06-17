@@ -10,9 +10,9 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Mortise.Accessibility.Abstractions" Version="0.0.1-alpha-202406160701" />
-		<PackageReference Include="Mortise.UiaAccessibility" Version="0.0.1-alpha-202406160701" />
-		<PackageReference Include="Mortise.UiaAccessibility.WeChat" Version="0.0.1-alpha-202406160701" />
+		<PackageReference Include="Mortise.Accessibility.Abstractions" Version="0.0.1-alpha-202406171232" />
+		<PackageReference Include="Mortise.UiaAccessibility" Version="0.0.1-alpha-202406171232" />
+		<PackageReference Include="Mortise.UiaAccessibility.WeChat" Version="0.0.1-alpha-202406171232" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.6" />
 		<PackageReference Include="Tenon.Automation.Windows" Version="0.0.1-alpha-202406141611" />
 		<PackageReference Include="Tenon.Helper" Version="0.0.1-alpha-202406141611" />
@@ -30,8 +30,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="MainForm.cs">
-	    <SubType>Form</SubType>
-	  </Compile>
+	  <Compile Update="MainForm.cs" />
 	</ItemGroup>
 </Project>
