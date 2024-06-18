@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text;
+using System.Text.Json;
 using FlaUI.Core.AutomationElements;
 using Mortise.Accessibility.Abstractions;
 using Mortise.UiaAccessibility;
@@ -213,7 +214,8 @@ public partial class MainForm : Form
             {
                 buttonTest?.Invoke();
                 _accessible.Record(buttonTest);
-                var jsonString = _serializer.SerializeObject(_accessible);
+                
+               var jsonString = _serializer.SerializeObject(_accessible);
                 File.WriteAllText("locator.path", jsonString, Encoding.UTF8);
                 var findElement = _accessible.FindComponent(jsonString);
                 AddLog(findElement != null ? "find Element" : "not find Element");
