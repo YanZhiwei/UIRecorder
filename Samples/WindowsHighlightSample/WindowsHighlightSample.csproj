@@ -10,9 +10,9 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Mortise.Accessibility.Abstractions" Version="0.0.1-alpha-202406181207" />
-		<PackageReference Include="Mortise.UiaAccessibility" Version="0.0.1-alpha-202406181207" />
-		<PackageReference Include="Mortise.UiaAccessibility.WeChat" Version="0.0.1-alpha-202406181207" />
+		<PackageReference Include="Mortise.Accessibility.Abstractions" Version="0.0.1-alpha-202406190206" />
+		<PackageReference Include="Mortise.UiaAccessibility" Version="0.0.1-alpha-202406190206" />
+		<PackageReference Include="Mortise.UiaAccessibility.WeChat" Version="0.0.1-alpha-202406190206" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.6" />
 		<PackageReference Include="Tenon.Automation.Windows" Version="0.0.1-alpha-202406141611" />
 		<PackageReference Include="Tenon.Helper" Version="0.0.1-alpha-202406141611" />
@@ -23,8 +23,8 @@
 		<PackageReference Include="FlaUI.UIA3" Version="4.0.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <!--<Reference Include="Mortise.Accessibility.Abstractions">
+	<!--<ItemGroup>
+	  <Reference Include="Mortise.Accessibility.Abstractions">
 	    <HintPath>..\..\..\Mortise\src\Mortise.Accessibility.Abstractions\bin\Debug\net8.0\Mortise.Accessibility.Abstractions.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Mortise.UiaAccessibility">
@@ -32,8 +32,8 @@
 	  </Reference>
 	  <Reference Include="Mortise.UiaAccessibility.WeChat">
 	    <HintPath>..\..\..\Mortise\src\UIA\Mortise.UiaAccessibility.WeChat\bin\Debug\net8.0-windows\Mortise.UiaAccessibility.WeChat.dll</HintPath>
-	  </Reference>-->
-	</ItemGroup>
+	  </Reference>
+	</ItemGroup>-->
 
 	<ItemGroup>
 	  <Compile Update="MainForm.cs" />
