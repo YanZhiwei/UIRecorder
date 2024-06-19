@@ -7,5 +7,17 @@
 
     <Application.Styles>
         <FluentTheme />
+        <Style Selector="Window">
+            <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
+            <Setter Property="ExtendClientAreaChromeHints" Value="Default" />
+            <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="-1" />
+            <!--<Setter Property="SystemDecorations" Value="None" />-->
+            <Setter Property="CanResize" Value="False" />
+            <!--<Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Opacity="0" Color="White" />
+                </Setter.Value>
+            </Setter>-->
+        </Style>
     </Application.Styles>
 </Application>

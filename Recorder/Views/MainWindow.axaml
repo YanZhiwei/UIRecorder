@@ -7,8 +7,11 @@
     xmlns:views="clr-namespace:Recorder.Views"
     xmlns:vm="using:Recorder.ViewModels"
     Title="Recorder"
-    d:DesignHeight="600"
-    d:DesignWidth="400"
+    Width="350"
+    Height="700"
+    d:DesignHeight="700"
+    d:DesignWidth="350"
+    CanResize="False"
     Icon="/Assets/avalonia-logo.ico"
     mc:Ignorable="d">
     <views:MainView />
