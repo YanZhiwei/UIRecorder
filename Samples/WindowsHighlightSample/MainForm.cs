@@ -19,9 +19,9 @@ public partial class MainForm : Form
     private static readonly object SyncRoot = new();
     protected static readonly ManualResetEvent Mre = new(true);
     private readonly Accessible _accessible;
+    private readonly IAccessibleLocatorStorage _accessibleLocatorStorage;
     private readonly string[] _ignoreProcessNames;
     private readonly ISerializer _serializer;
-    private readonly IAccessibleLocatorStorage _accessibleLocatorStorage;
     private readonly WindowsHighlightRectangle _windowsHighlight;
     protected readonly ConcurrentStack<MouseEventArgs> MouseDownQueue = new();
     protected readonly ConcurrentStack<MouseEventArgs> MouseMoveQueue = new();
@@ -71,8 +71,8 @@ public partial class MainForm : Form
             MouseHook.MouseMove += Hook_MouseMove;
             MouseHook.LeftButtonDown += Hook_MouseDown;
             MouseHook.RightButtonDown += Hook_MouseDown;
-            MouseHook.LeftButtonUp += Hook_UpDown;
-            MouseHook.RightButtonUp += Hook_UpDown;
+            MouseHook.LeftButtonUp += Hook_ButtonUp;
+            MouseHook.RightButtonUp += Hook_ButtonUp;
             KeyboardHook.KeyDown += Hook_KeyDown;
             KeyboardHook.KeyUp += Hook_KeyUp;
             if (WorkerThread == null)
@@ -90,19 +90,21 @@ public partial class MainForm : Form
         }
     }
 
+    private void Hook_ButtonUp(object? sender, MouseEventArgs e)
+    {
+        _isLeftControl = false;
+        MouseDownQueue.Clear();
+    }
+
     private void Hook_KeyUp(object? sender, KeyEventArgs e)
     {
         _isLeftControl = false;
+        MouseDownQueue.Clear();
     }
 
     private void Hook_KeyDown(object? sender, KeyEventArgs e)
     {
         _isLeftControl = true;
-    }
-
-    private void Hook_UpDown(object? sender, MouseEventArgs e)
-    {
-        MouseDownQueue.Clear();
     }
 
     private void Hook_MouseDown(object? sender, MouseEventArgs e)
@@ -185,8 +187,8 @@ public partial class MainForm : Form
             MouseHook.MouseMove -= Hook_MouseMove;
             MouseHook.LeftButtonDown -= Hook_MouseDown;
             MouseHook.RightButtonDown -= Hook_MouseDown;
-            MouseHook.LeftButtonUp -= Hook_UpDown;
-            MouseHook.RightButtonUp -= Hook_UpDown;
+            MouseHook.LeftButtonUp -= Hook_ButtonUp;
+            MouseHook.RightButtonUp -= Hook_ButtonUp;
             KeyboardHook.KeyDown -= Hook_KeyDown;
             KeyboardHook.KeyUp -= Hook_KeyUp;
             MouseHook.Uninstall();
