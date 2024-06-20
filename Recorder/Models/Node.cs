@@ -1,26 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
-namespace Recorder.Models
+namespace Recorder.Models;
+
+public class Node
 {
-    public class Node
+    public Node(string title)
     {
-        public ObservableCollection<Node>? SubNodes { get; }
-        public string Title { get; }
-
-        public Node(string title)
-        {
-            Title = title;
-        }
-
-        public Node(string title, ObservableCollection<Node> subNodes)
-        {
-            Title = title;
-            SubNodes = subNodes;
-        }
+        Title = title;
     }
+
+    public Node(string title, ObservableCollection<Node> subNodes)
+    {
+        Title = title;
+        SubNodes = subNodes;
+    }
+
+    public ObservableCollection<Node>? SubNodes { get; }
+    public string Title { get; }
 }

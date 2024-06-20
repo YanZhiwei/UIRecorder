@@ -11,7 +11,7 @@
             <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
             <Setter Property="ExtendClientAreaChromeHints" Value="Default" />
             <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="-1" />
-            <Setter Property="SystemDecorations" Value="None" />
+            <!--<Setter Property="SystemDecorations" Value="None" />-->
             <Setter Property="CanResize" Value="False" />
         </Style>
     </Application.Styles>

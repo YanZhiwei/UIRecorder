@@ -5,11 +5,21 @@ using Avalonia.Markup.Xaml;
 
 using Recorder.ViewModels;
 using Recorder.Views;
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Mortise.Accessibility.Locator.Abstractions;
+using Tenon.Serialization.Abstractions;
 
 namespace Recorder;
 
 public partial class App : Application
 {
+
+
+    public App()
+    {
+      
+    }
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
