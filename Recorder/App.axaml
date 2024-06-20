@@ -2,7 +2,7 @@
     x:Class="Recorder.App"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    RequestedThemeVariant="Default">
+    RequestedThemeVariant="Light">
     <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
 
     <Application.Styles>
@@ -11,13 +11,8 @@
             <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
             <Setter Property="ExtendClientAreaChromeHints" Value="Default" />
             <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="-1" />
-            <!--<Setter Property="SystemDecorations" Value="None" />-->
+            <Setter Property="SystemDecorations" Value="None" />
             <Setter Property="CanResize" Value="False" />
-            <!--<Setter Property="Background">
-                <Setter.Value>
-                    <SolidColorBrush Opacity="0" Color="White" />
-                </Setter.Value>
-            </Setter>-->
         </Style>
     </Application.Styles>
 </Application>
