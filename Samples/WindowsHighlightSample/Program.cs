@@ -1,4 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using Mortise.Accessibility.Locator.Json.Configurations;
+using Mortise.Accessibility.Locator.Json.Extensions;
+using Mortise.UiaAccessibility.Converters;
 using Mortise.UiaAccessibility.Extensions;
 using Mortise.UiaAccessibility.WeChat.Configurations;
 
@@ -37,5 +40,6 @@ internal static class Program
     {
         services.AddScoped<MainForm>();
         services.AddUiaAccessible(option => { option.AddWeChatAccessible(); });
+        services.AddJsonLocator(option => { option.UseLocalStorage(); }, [new UiaAccessibleComponentConverter()]);
     }
 }
