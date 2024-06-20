@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text;
-using System.Text.Json;
 using FlaUI.Core.AutomationElements;
 using Mortise.Accessibility.Abstractions;
+using Mortise.Accessibility.Locator.Abstractions;
 using Mortise.UiaAccessibility;
 using Tenon.Automation.Windows;
 using Tenon.Infra.Windows.Form.Common;
@@ -21,6 +21,7 @@ public partial class MainForm : Form
     private readonly Accessible _accessible;
     private readonly string[] _ignoreProcessNames;
     private readonly ISerializer _serializer;
+    private readonly IAccessibleLocatorStorage _accessibleLocatorStorage;
     private readonly WindowsHighlightRectangle _windowsHighlight;
     protected readonly ConcurrentStack<MouseEventArgs> MouseDownQueue = new();
     protected readonly ConcurrentStack<MouseEventArgs> MouseMoveQueue = new();
@@ -28,10 +29,12 @@ public partial class MainForm : Form
     private bool _shutdown;
     protected Thread? WorkerThread;
 
-    public MainForm(Accessible accessible, ISerializer serializer)
+    public MainForm(Accessible accessible, ISerializer serializer, IAccessibleLocatorStorage accessibleLocatorStorage)
     {
         _accessible = accessible ?? throw new ArgumentNullException(nameof(accessible));
         _serializer = serializer;
+        _accessibleLocatorStorage = accessibleLocatorStorage ??
+                                    throw new ArgumentNullException(nameof(accessibleLocatorStorage));
         InitializeComponent();
         _windowsHighlight = new WindowsHighlightRectangle();
         _ignoreProcessNames = [Process.GetCurrentProcess().ProcessName];
@@ -214,10 +217,11 @@ public partial class MainForm : Form
             {
                 buttonTest?.Invoke();
                 _accessible.Record(buttonTest);
-                
-               var jsonString = _serializer.SerializeObject(_accessible);
+
+                var jsonString = _serializer.SerializeObject(_accessible);
                 File.WriteAllText("locator.path", jsonString, Encoding.UTF8);
-                var findElement = _accessible.FindComponent(jsonString);
+                var accessible1 = _serializer.DeserializeObject<UiaAccessible>(jsonString);
+                var findElement = _accessible.FindComponent(accessible1);
                 AddLog(findElement != null ? "find Element" : "not find Element");
                 if (findElement is UiaAccessibleComponent component)
                     component.Click();
@@ -242,42 +246,61 @@ public partial class MainForm : Form
         var accessibleDict =
             new ConcurrentDictionary<string, Accessible>(StringComparer.OrdinalIgnoreCase);
         var locator1 = @"{
-    ""fileName"": ""CalculatorApp"",
-    ""provider"": ""Uia"",
-    ""platform"": ""Win32NT"",
-    ""version"": ""3.0.0"",
-    ""components"": [
-        {
-            ""name"": ""¼ÆËãÆ÷"",
-            ""controlType"": ""Window"",
-            ""isDialog"": false,
-            ""id"": null
-        },
-        {
-            ""name"": null,
-            ""controlType"": ""Custom"",
-            ""isDialog"": false,
-            ""id"": ""NavView""
-        },
-        {
-            ""name"": null,
-            ""controlType"": ""Group"",
-            ""isDialog"": false,
-            ""id"": null
-        },
-        {
-            ""name"": ""Êý×Ö¼üÅÌ"",
-            ""controlType"": ""Group"",
-            ""isDialog"": false,
-            ""id"": ""NumberPad""
-        },
-        {
-            ""name"": ""Ò»"",
-            ""controlType"": ""Button"",
-            ""isDialog"": false,
-            ""id"": ""num1Button""
-        }
-    ]
+  ""uniqueId"": ""num1Button"",
+  ""fileName"": ""CalculatorApp"",
+  ""provider"": ""Uia"",
+  ""platform"": ""Win32NT"",
+  ""version"": ""3.0.0"",
+  ""components"": [
+    {
+      ""className"": ""ApplicationFrameWindow"",
+      ""name"": ""\u8BA1\u7B97\u5668"",
+      ""controlType"": ""Window"",
+      ""isDialog"": false,
+      ""id"": null,
+      ""isPassword"": false
+    },
+    {
+      ""className"": ""Windows.UI.Core.CoreWindow"",
+      ""name"": ""\u8BA1\u7B97\u5668"",
+      ""controlType"": ""Window"",
+      ""isDialog"": false,
+      ""id"": null,
+      ""isPassword"": false
+    },
+    {
+      ""className"": null,
+      ""name"": null,
+      ""controlType"": ""Custom"",
+      ""isDialog"": false,
+      ""id"": ""NavView"",
+      ""isPassword"": false
+    },
+    {
+      ""className"": ""LandmarkTarget"",
+      ""name"": null,
+      ""controlType"": ""Group"",
+      ""isDialog"": false,
+      ""id"": null,
+      ""isPassword"": false
+    },
+    {
+      ""className"": ""NamedContainerAutomationPeer"",
+      ""name"": ""\u6570\u5B57\u952E\u76D8"",
+      ""controlType"": ""Group"",
+      ""isDialog"": false,
+      ""id"": ""NumberPad"",
+      ""isPassword"": false
+    },
+    {
+      ""className"": ""Button"",
+      ""name"": ""\u4E00"",
+      ""controlType"": ""Button"",
+      ""isDialog"": false,
+      ""id"": ""num1Button"",
+      ""isPassword"": false
+    }
+  ]
 }";
         var accessible1 = _serializer.DeserializeObject<UiaAccessible>(locator1);
         AddLog(accessible1.FileName);

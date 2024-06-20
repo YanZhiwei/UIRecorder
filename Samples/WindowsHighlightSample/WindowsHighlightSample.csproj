@@ -10,9 +10,11 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Mortise.Accessibility.Abstractions" Version="0.0.1-alpha-202406190206" />
-		<PackageReference Include="Mortise.UiaAccessibility" Version="0.0.1-alpha-202406190206" />
-		<PackageReference Include="Mortise.UiaAccessibility.WeChat" Version="0.0.1-alpha-202406190206" />
+		<PackageReference Include="Mortise.Accessibility.Abstractions" Version="0.0.1-alpha-202406201222" />
+		<PackageReference Include="Mortise.Accessibility.Locator.Abstractions" Version="0.0.1-alpha-202406201222" />
+		<PackageReference Include="Mortise.Accessibility.Locator.Json" Version="0.0.1-alpha-202406201222" />
+		<PackageReference Include="Mortise.UiaAccessibility" Version="0.0.1-alpha-202406201222" />
+		<PackageReference Include="Mortise.UiaAccessibility.WeChat" Version="0.0.1-alpha-202406201222" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.6" />
 		<PackageReference Include="Tenon.Automation.Windows" Version="0.0.1-alpha-202406141611" />
 		<PackageReference Include="Tenon.Helper" Version="0.0.1-alpha-202406141611" />
@@ -26,6 +28,12 @@
 	<!--<ItemGroup>
 	  <Reference Include="Mortise.Accessibility.Abstractions">
 	    <HintPath>..\..\..\Mortise\src\Mortise.Accessibility.Abstractions\bin\Debug\net8.0\Mortise.Accessibility.Abstractions.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Mortise.Accessibility.Locator.Abstractions">
+	    <HintPath>..\..\..\Mortise\src\Mortise.Accessibility.Locator.Json\bin\Debug\net8.0\Mortise.Accessibility.Locator.Abstractions.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Mortise.Accessibility.Locator.Json">
+	    <HintPath>..\..\..\Mortise\src\Mortise.Accessibility.Locator.Json\bin\Debug\net8.0\Mortise.Accessibility.Locator.Json.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Mortise.UiaAccessibility">
 	    <HintPath>..\..\..\Mortise\src\UIA\Mortise.UIAAccessibility\bin\Debug\net8.0-windows\Mortise.UiaAccessibility.dll</HintPath>
