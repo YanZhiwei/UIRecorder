@@ -1,25 +1,16 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-
+using Microsoft.Extensions.DependencyInjection;
+using Recorder.Extensions;
 using Recorder.ViewModels;
 using Recorder.Views;
-using System;
-using Microsoft.Extensions.DependencyInjection;
-using Mortise.Accessibility.Locator.Abstractions;
-using Tenon.Serialization.Abstractions;
 
 namespace Recorder;
 
-public partial class App : Application
+public class App : Application
 {
-
-
-    public App()
-    {
-      
-    }
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -27,22 +18,19 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Line below is needed to remove Avalonia data validation.
-        // Without this line you will get duplicate validations from both Avalonia and CT
-        BindingPlugins.DataValidators.RemoveAt(0);
-
+        var collection = new ServiceCollection();
+        collection.AddAccessibleServices();
+        collection.AddCommonServices();
+        var services = collection.BuildServiceProvider();
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            // Line below is needed to remove Avalonia data validation.
+            // Without this line you will get duplicate validations from both Avalonia and CT
+            BindingPlugins.DataValidators.RemoveAt(0);
+            var mainWindowViewModel = services.GetRequiredService<MainWindowViewModel>();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel()
-            };
-        }
-        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-        {
-            singleViewPlatform.MainView = new MainView
-            {
-                DataContext = new MainViewModel()
+                DataContext = mainWindowViewModel
             };
         }
 
