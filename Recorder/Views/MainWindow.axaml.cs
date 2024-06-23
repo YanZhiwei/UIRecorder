@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Recorder.ViewModels;
 
 namespace Recorder.Views
 {
