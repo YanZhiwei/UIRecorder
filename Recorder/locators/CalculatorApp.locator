@@ -1,31 +1,23 @@
 ﻿[
   {
-    "uniqueId": "num1Button",
+    "uniqueId": "num7Button",
     "fileName": "CalculatorApp",
     "provider": "Uia",
     "platform": "Win32NT",
     "version": "3.0.0",
     "components": [
       {
-        "className": "Button",
-        "name": "\u4E00",
-        "controlType": "Button",
+        "className": "ApplicationFrameWindow",
+        "name": "\u8BA1\u7B97\u5668",
+        "controlType": "Window",
         "isDialog": false,
-        "id": "num1Button",
+        "id": null,
         "isPassword": false
       },
       {
-        "className": "NamedContainerAutomationPeer",
-        "name": "\u6570\u5B57\u952E\u76D8",
-        "controlType": "Group",
-        "isDialog": false,
-        "id": "NumberPad",
-        "isPassword": false
-      },
-      {
-        "className": "LandmarkTarget",
-        "name": null,
-        "controlType": "Group",
+        "className": "Windows.UI.Core.CoreWindow",
+        "name": "\u8BA1\u7B97\u5668",
+        "controlType": "Window",
         "isDialog": false,
         "id": null,
         "isPassword": false
@@ -39,36 +31,11 @@
         "isPassword": false
       },
       {
-        "className": "Windows.UI.Core.CoreWindow",
-        "name": "\u8BA1\u7B97\u5668",
-        "controlType": "Window",
+        "className": "LandmarkTarget",
+        "name": null,
+        "controlType": "Group",
         "isDialog": false,
         "id": null,
-        "isPassword": false
-      },
-      {
-        "className": "ApplicationFrameWindow",
-        "name": "\u8BA1\u7B97\u5668",
-        "controlType": "Window",
-        "isDialog": false,
-        "id": null,
-        "isPassword": false
-      }
-    ]
-  },
-  {
-    "uniqueId": "num2Button",
-    "fileName": "CalculatorApp",
-    "provider": "Uia",
-    "platform": "Win32NT",
-    "version": "3.0.0",
-    "components": [
-      {
-        "className": "Button",
-        "name": "\u4E00",
-        "controlType": "Button",
-        "isDialog": false,
-        "id": "num2Button",
         "isPassword": false
       },
       {
@@ -80,35 +47,11 @@
         "isPassword": false
       },
       {
-        "className": "LandmarkTarget",
-        "name": null,
-        "controlType": "Group",
+        "className": "Button",
+        "name": "\u4E03",
+        "controlType": "Button",
         "isDialog": false,
-        "id": null,
-        "isPassword": false
-      },
-      {
-        "className": null,
-        "name": null,
-        "controlType": "Custom",
-        "isDialog": false,
-        "id": "NavView",
-        "isPassword": false
-      },
-      {
-        "className": "Windows.UI.Core.CoreWindow",
-        "name": "\u8BA1\u7B97\u5668",
-        "controlType": "Window",
-        "isDialog": false,
-        "id": null,
-        "isPassword": false
-      },
-      {
-        "className": "ApplicationFrameWindow",
-        "name": "\u8BA1\u7B97\u5668",
-        "controlType": "Window",
-        "isDialog": false,
-        "id": null,
+        "id": "num7Button",
         "isPassword": false
       }
     ]

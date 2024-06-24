@@ -2,9 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,7 +11,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Mortise.Accessibility.Abstractions;
 using Mortise.Accessibility.Locator.Abstractions;
-using Mortise.UiaAccessibility;
 using Recorder.Messenger;
 using Recorder.Models;
 using Tenon.Automation.Windows;
@@ -30,13 +27,15 @@ public partial class MainWindowViewModel
     private static readonly ManualResetEvent Mre = new(true);
     private readonly Accessible _accessible;
     private readonly IAccessibleLocatorStorage _accessibleLocatorStorage;
-    private readonly string _appData;
     private readonly string[] _ignoreProcessNames;
-    private readonly ISerializer _serializer;
-    private readonly WindowsHighlightRectangle _windowsHighlight;
     private readonly ConcurrentStack<MouseEventArgs> _mouseDownQueue = new();
     private readonly ConcurrentStack<MouseEventArgs> _mouseMoveQueue = new();
+    private readonly ISerializer _serializer;
+    private readonly WindowsHighlightRectangle _windowsHighlight;
     private bool _isLeftControl;
+
+    [ObservableProperty] private ObservableCollection<Node>? _locatorNodes;
+
     private bool _shutdown;
     private Thread? _workerThread;
 
@@ -49,38 +48,27 @@ public partial class MainWindowViewModel
     {
         _serializer = serializer;
         _accessible = accessible ?? throw new ArgumentNullException(nameof(accessible));
-        _accessibleLocatorStorage = accessibleLocatorStorage;
-        _appData = Path.Combine(AppContext.BaseDirectory, "locators");
-        locatorNodes = Initializelocators();
+        _accessibleLocatorStorage = accessibleLocatorStorage ??
+                                    throw new ArgumentNullException(nameof(accessibleLocatorStorage));
+        LocatorNodes = new ObservableCollection<Node>();
         _windowsHighlight = new WindowsHighlightRectangle();
         _ignoreProcessNames = [Process.GetCurrentProcess().ProcessName];
     }
 
-    [ObservableProperty]
-    private ObservableCollection<Node>? locatorNodes;
-    //public ObservableCollection<Node> LocatorNodes { get; }
-
-
-    //partial void OnLocatorNodesChanged(Node? value)
-    //{
-
-    //}
-    private ObservableCollection<Node> Initializelocators()
+    partial void OnLocatorNodesChanging(ObservableCollection<Node>? value)
     {
-        var nodes = new ObservableCollection<Node>();
-        if (!Directory.Exists(_appData)) return nodes;
-        var locatorFiles = Directory.EnumerateFiles(_appData, "*.locator").ToArray();
-        foreach (var locatorFile in locatorFiles)
+        value ??= new ObservableCollection<Node>();
+        var accessibles = _accessibleLocatorStorage.Load();
+        if (!(accessibles?.Any() ?? false)) return;
+        var accessiblesDict =
+            accessibles.GroupBy(s => s.FileName).ToDictionary(k => k.Key, v => v.ToArray());
+        foreach (var accessibleItem in accessiblesDict)
         {
-            var locatorName = Path.GetFileNameWithoutExtension(locatorFile);
-            var locatorJsonString = File.ReadAllText(locatorFile, Encoding.UTF8);
-            var accessibles = _serializer.DeserializeObject<UiaAccessible[]>(locatorJsonString);
-            var locator = new Node(locatorName, new ObservableCollection<Node>());
-            foreach (var accessible in accessibles) locator.SubNodes.Add(new Node(accessible.UniqueId));
-            nodes.Add(locator);
+            var locator = new Node(accessibleItem.Key, []);
+            foreach (var accessible in accessibleItem.Value)
+                locator.SubNodes?.Add(new Node(accessible.UniqueId));
+            value.Add(locator);
         }
-
-        return nodes;
     }
 
     private void Hook_ButtonUp(object? sender, MouseEventArgs e)
@@ -118,7 +106,7 @@ public partial class MainWindowViewModel
         while (_shutdown)
             try
             {
-                Mre.WaitOne(); //�ȴ��ź�
+                Mre.WaitOne();
                 AccessibleComponent? element;
                 if (_mouseDownQueue.TryPop(out var ee))
                 {
@@ -133,11 +121,11 @@ public partial class MainWindowViewModel
                     if (_isLeftControl)
                     {
                         element = ElementFromPointAsync(ee.Location).ConfigureAwait(false).GetAwaiter().GetResult();
-                        if (element is {BoundingRectangle.IsEmpty: false})
+                        if (element is { BoundingRectangle.IsEmpty: false })
                         {
                             _windowsHighlight.SetLocation(element.BoundingRectangle, element.ControlType.ToString());
                             _accessible.Record(element.NativeElement);
-                            var jsonString = _serializer.SerializeObject(_accessible);
+                            _accessibleLocatorStorage.Add(_accessible);
                         }
                         else
                         {
@@ -173,7 +161,7 @@ public partial class MainWindowViewModel
         {
             var hwNd = Window.Get(location);
             if (hwNd == IntPtr.Zero) return null;
-            var higherProcessName = Process.GetProcessById((int) Window.GetProcessId(hwNd)).ProcessName;
+            var higherProcessName = Process.GetProcessById((int)Window.GetProcessId(hwNd)).ProcessName;
             if (_ignoreProcessNames.Contains(higherProcessName, StringComparer.OrdinalIgnoreCase))
                 return null;
             var hoveredElement = _accessible.Identity.FromPoint(location);
@@ -211,6 +199,7 @@ public partial class MainWindowViewModel
     [RelayCommand]
     private void Save()
     {
+        _accessibleLocatorStorage.Save();
         WeakReferenceMessenger.Default.Send(new CloseWindowMessage
         {
             Sender = new WeakReference(this)

@@ -12,7 +12,8 @@ public static class ServiceCollectionExtension
     public static void AddAccessibleServices(this IServiceCollection services)
     {
         services.AddUiaAccessible(option => { option.AddWeChatAccessible(); });
-        services.AddJsonLocator(option => { option.UseLocalStorage(); }, [new UiaAccessibleComponentConverter()]);
+        services.AddJsonLocator(option => { option.UseLocalStorage(); },
+            [new UiaAccessibleConverter(), new UiaAccessibleComponentConverter()]);
     }
 
     public static void AddCommonServices(this IServiceCollection services)
