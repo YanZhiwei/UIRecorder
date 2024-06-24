@@ -47,8 +47,14 @@
                 Grid.Row="2"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
-                <Button Margin="0,0,10,0" Content="录制" Command="{Binding RecordCommand}" />
-                <Button Margin="0,0,10,0" Content="关闭" Command="{Binding SaveCommand}"/>
+                <Button
+                    Margin="0,0,10,0"
+                    Command="{Binding RecordCommand}"
+                    Content="录制" />
+                <Button
+                    Margin="0,0,10,0"
+                    Command="{Binding SaveCommand}"
+                    Content="关闭" />
             </StackPanel>
 
         </Grid>

@@ -10,11 +10,11 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Mortise.Accessibility.Abstractions" Version="0.0.1-alpha-202406201222" />
-		<PackageReference Include="Mortise.Accessibility.Locator.Abstractions" Version="0.0.1-alpha-202406201222" />
-		<PackageReference Include="Mortise.Accessibility.Locator.Json" Version="0.0.1-alpha-202406201222" />
-		<PackageReference Include="Mortise.UiaAccessibility" Version="0.0.1-alpha-202406201222" />
-		<PackageReference Include="Mortise.UiaAccessibility.WeChat" Version="0.0.1-alpha-202406201222" />
+		<PackageReference Include="Mortise.Accessibility.Abstractions" Version="0.0.1-alpha-202406241300" />
+		<PackageReference Include="Mortise.Accessibility.Locator.Abstractions" Version="0.0.1-alpha-202406241300" />
+		<PackageReference Include="Mortise.Accessibility.Locator.Json" Version="0.0.1-alpha-202406241300" />
+		<PackageReference Include="Mortise.UiaAccessibility" Version="0.0.1-alpha-202406241300" />
+		<PackageReference Include="Mortise.UiaAccessibility.WeChat" Version="0.0.1-alpha-202406241300" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.6" />
 		<PackageReference Include="Tenon.Automation.Windows" Version="0.0.1-alpha-202406141611" />
 		<PackageReference Include="Tenon.Helper" Version="0.0.1-alpha-202406141611" />
