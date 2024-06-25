@@ -14,6 +14,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include=".locators\Calculator.locator">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include=".locators\CalculatorApp.locator">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include=".locators\msedge.locator">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.0.11" />
     <PackageReference Include="Avalonia.Desktop" Version="11.0.11" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.11" />
@@ -21,11 +33,11 @@
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.11" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="Mortise.Accessibility.Abstractions" Version="0.0.1-alpha-202406241300" />
-    <PackageReference Include="Mortise.Accessibility.Locator.Abstractions" Version="0.0.1-alpha-202406241300" />
-    <PackageReference Include="Mortise.Accessibility.Locator.Json" Version="0.0.1-alpha-202406241300" />
-    <PackageReference Include="Mortise.UiaAccessibility" Version="0.0.1-alpha-202406241300" />
-    <PackageReference Include="Mortise.UiaAccessibility.WeChat" Version="0.0.1-alpha-202406241300" />
+    <PackageReference Include="Mortise.Accessibility.Abstractions" Version="0.0.1-alpha-202406250149" />
+    <PackageReference Include="Mortise.Accessibility.Locator.Abstractions" Version="0.0.1-alpha-202406250149" />
+    <PackageReference Include="Mortise.Accessibility.Locator.Json" Version="0.0.1-alpha-202406250149" />
+    <PackageReference Include="Mortise.UiaAccessibility" Version="0.0.1-alpha-202406250149" />
+    <PackageReference Include="Mortise.UiaAccessibility.WeChat" Version="0.0.1-alpha-202406250149" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.6" />
     <PackageReference Include="Tenon.Automation.Windows" Version="0.0.1-alpha-202406141611" />
     <PackageReference Include="Tenon.Helper" Version="0.0.1-alpha-202406141611" />
@@ -37,15 +49,12 @@
 
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="locators\Calculator.locator">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="locators\CalculatorApp.locator">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="locators\msedge.locator">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+  <!--<ItemGroup>
+    <Reference Include="Mortise.Accessibility.Locator.Abstractions">
+      <HintPath>..\..\Mortise\src\Mortise.Accessibility.Locator.Abstractions\bin\Debug\net8.0\Mortise.Accessibility.Locator.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Mortise.Accessibility.Locator.Json">
+      <HintPath>..\..\Mortise\src\Mortise.Accessibility.Locator.Json\bin\Debug\net8.0\Mortise.Accessibility.Locator.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>-->
 </Project>

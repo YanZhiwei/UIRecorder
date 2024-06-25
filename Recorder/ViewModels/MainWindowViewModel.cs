@@ -52,17 +52,15 @@ public partial class MainWindowViewModel
                                     throw new ArgumentNullException(nameof(accessibleLocatorStorage));
         LocatorNodes = new ObservableCollection<Node>();
         _windowsHighlight = new WindowsHighlightRectangle();
-        _ignoreProcessNames = [Process.GetCurrentProcess().ProcessName];
+        _ignoreProcessNames = [Process.GetCurrentProcess().ProcessName, "devenv"];
     }
 
     partial void OnLocatorNodesChanging(ObservableCollection<Node>? value)
     {
         value ??= new ObservableCollection<Node>();
-        var accessibles = _accessibleLocatorStorage.Load();
-        if (!(accessibles?.Any() ?? false)) return;
-        var accessiblesDict =
-            accessibles.GroupBy(s => s.FileName).ToDictionary(k => k.Key, v => v.ToArray());
-        foreach (var accessibleItem in accessiblesDict)
+        _accessibleLocatorStorage.Load();
+        if (!(_accessibleLocatorStorage?.AccessibleDict.Any() ?? false)) return;
+        foreach (var accessibleItem in _accessibleLocatorStorage.AccessibleDict)
         {
             var locator = new Node(accessibleItem.Key, []);
             foreach (var accessible in accessibleItem.Value)
@@ -125,7 +123,7 @@ public partial class MainWindowViewModel
                         {
                             _windowsHighlight.SetLocation(element.BoundingRectangle, element.ControlType.ToString());
                             _accessible.Record(element.NativeElement);
-                            _accessibleLocatorStorage.Add(_accessible);
+                            SyncAccessibleToNode(_accessible);
                         }
                         else
                         {
@@ -152,6 +150,27 @@ public partial class MainWindowViewModel
             {
                 // ignored
             }
+    }
+
+    private void SyncAccessibleToNode(Accessible? accessible)
+    {
+        if (accessible == null) return;
+        if (_accessibleLocatorStorage.Add(accessible))
+        {
+            var existNode =
+                LocatorNodes.FirstOrDefault(
+                    c => c.Title.Equals(accessible.FileName, StringComparison.OrdinalIgnoreCase));
+            if (existNode == null)
+            {
+                var newNode = new Node(accessible.FileName, []);
+                newNode?.SubNodes?.Add(new Node(accessible.UniqueId));
+                LocatorNodes.Add(newNode);
+            }
+            else
+            {
+                existNode?.SubNodes?.Add(new Node(accessible.UniqueId));
+            }
+        }
     }
 
 

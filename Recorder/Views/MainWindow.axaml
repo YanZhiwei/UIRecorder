@@ -11,6 +11,7 @@
     d:DesignHeight="700"
     d:DesignWidth="350"
     x:DataType="vm:MainWindowViewModel"
+    CornerRadius="10"
     Icon="/Assets/avalonia-logo.ico"
     mc:Ignorable="d">
 
