@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{336D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsHighlightSample", "Samples\WindowsHighlightSample\WindowsHighlightSample.csproj", "{E1BECF7F-257E-416E-92CC-52378DEEF985}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recorder", "Recorder\Recorder.csproj", "{B798B7BD-05DB-42E9-98E0-C4FE70614ACC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recorder", "Recorder\Recorder.csproj", "{B798B7BD-05DB-42E9-98E0-C4FE70614ACC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
