@@ -183,7 +183,7 @@ public partial class MainWindowViewModel
             var higherProcessName = Process.GetProcessById((int)Window.GetProcessId(hwNd)).ProcessName;
             if (_ignoreProcessNames.Contains(higherProcessName, StringComparer.OrdinalIgnoreCase))
                 return null;
-            var hoveredElement = _accessible.Identity.FromPoint(location);
+            var hoveredElement = _accessible.Detector.FromPoint(location);
             return hoveredElement;
         });
     }
