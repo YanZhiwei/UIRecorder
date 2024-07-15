@@ -49,7 +49,7 @@ public partial class MainForm : Form
             var higherProcessName = Process.GetProcessById((int)Window.GetProcessId(hwNd)).ProcessName;
             if (_ignoreProcessNames.Contains(higherProcessName, StringComparer.OrdinalIgnoreCase))
                 return null;
-            var hoveredElement = _accessible.Identity.FromPoint(location);
+            var hoveredElement = _accessible.Detector.FromPoint(location);
             return hoveredElement;
         });
     }
@@ -210,7 +210,7 @@ public partial class MainForm : Form
 
     private void button5_Click(object sender, EventArgs e)
     {
-        if (_accessible.Identity is not UiaAccessibleIdentity uiaAccessibleIdentity) return;
+        if (_accessible.Detector is not UiaAccessibleDetector uiaAccessibleIdentity) return;
         var mainWindow = uiaAccessibleIdentity.DesktopElement.FindFirstChild(cf => cf.ByName("¼ÆËãÆ÷"));
         if (mainWindow != null)
         {
